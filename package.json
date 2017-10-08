@@ -1,0 +1,65 @@
+{
+  "name": "sr-igncp",
+  "version": "0.0.1",
+  "description": "Search and replace for the command line",
+  "main": "index.js",
+  "bin": {
+    "sr": "./lib/cli.js"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/babel -d lib src",
+    "lint": "./node_modules/.bin/eslint .",
+    "prepublish": "npm run test && npm run build",
+    "prepush": "sh helpers/gitHooks/prepush.sh",
+    "test": "./node_modules/.bin/jest",
+    "test:coverage": "npm run test -- --coverage",
+    "watch": "npm run build -- --watch"
+  },
+  "author": "Ignacio Carbajo <icarbarbajop@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.1.0",
+    "commander": "^2.11.0",
+    "inquirer": "^3.3.0",
+    "walk": "^2.3.9"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^4.8.0",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jest": "^21.2.0",
+    "flow-bin": "^0.56.0",
+    "husky": "^0.14.3",
+    "jest": "^21.2.1"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "__tests__"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text-summary",
+      "cobertura"
+    ],
+    "roots": [
+      "src"
+    ],
+    "globals": {
+      "__TEST__": true
+    },
+    "moduleNameMapper": {
+      "^.+\\.(png|jpg|gif|css|scss|svg)$": "<rootDir>/helpers/tests/fileMock.js"
+    },
+    "resetMocks": true,
+    "setupTestFrameworkScriptFile": "<rootDir>/helpers/tests/setupTests.js",
+    "testRegex": "(/__tests__/.*|(\\.|/))\\.test\\.js$"
+  }
+}
