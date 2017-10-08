@@ -1,5 +1,7 @@
 // @flow
 
+import path from "path"
+
 import walk from "walk"
 import chalk from "chalk"
 import inquirer from "inquirer"
@@ -187,7 +189,8 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
     await confirmOptions(finalOptions)
   }
 
-  const walker = walk.walk(finalOptions.searchPath, { followLinks: false })
+  const resolvedSearchPath = path.resolve(finalOptions.searchPath)
+  const walker = walk.walk(resolvedSearchPath, { followLinks: false })
   const handleFile = getHandleFileFn(finalOptions)
 
   walker.on("file", handleFile)
