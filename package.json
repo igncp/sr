@@ -13,6 +13,7 @@
     "prepush": "sh helpers/gitHooks/prepush.sh",
     "test": "./node_modules/.bin/jest",
     "test:coverage": "npm run test -- --coverage",
+    "test:travis": "npm run test:coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "watch": "npm run build -- --watch"
   },
   "author": "Ignacio Carbajo <icarbarbajop@gmail.com>",
@@ -28,6 +29,7 @@
     "babel-eslint": "^8.0.1",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-env": "^1.6.0",
+    "coveralls": "^3.0.0",
     "eslint": "^4.8.0",
     "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-import": "^2.7.0",
