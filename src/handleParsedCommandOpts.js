@@ -3,30 +3,20 @@
 import path from "path"
 
 import walk from "walk"
-import chalk from "chalk"
 import inquirer from "inquirer"
 
 import texts from "./texts"
 import {
-  readFile,
-  writeFile,
   exitWithError,
 } from "./helpers"
+import type {
+  T_FinalOptions,
+  T_ParsedCommandOpts,
+} from "./commonTypes"
 
-export type T_ParsedCommandOpts = ExactSpreadWorkaround<{|
-  searchPath: string,
-  searchPattern: string,
-  searchReplacement: string,
-  shouldBeCaseSensitive: boolean,
-  shouldBePreview: boolean,
-  shouldConfirmOptions: boolean,
-|}>
+import replaceFileIfNecessary from "./replaceFileIfNecessary"
 
 type T_handleParsedCommandOpts = (opts: T_ParsedCommandOpts) => Promise<void>
-
-type T_FinalOptions = ExactSpreadWorkaround<{|
-  ...T_ParsedCommandOpts,
-|}>
 
 type T_QuestionCommon = ExactSpreadWorkaround<{|
   validate?: (v: any) => string | boolean,
@@ -34,60 +24,18 @@ type T_QuestionCommon = ExactSpreadWorkaround<{|
   message: string,
 |}>
 
+type T_QuestionInputNames = 'path' | 'search' | 'replace'
+type T_QuestionConfirmNames = 'confirm'
+
 type T_Question = ExactSpreadWorkaround<{|
-  name: 'path' | 'search' | 'replace',
+  name: T_QuestionInputNames,
   type: 'input',
   ...T_QuestionCommon,
 |}> | ExactSpreadWorkaround<{|
-  name: 'confirm',
+  name: T_QuestionConfirmNames,
   type: 'confirm',
   ...T_QuestionCommon,
 |}>
-
-const replace = ({
-  fileContent,
-  finalOptions,
-}) => {
-  const regexpOpts = `g${finalOptions.shouldBeCaseSensitive ? "" : "i"}`
-  const regex = new RegExp(finalOptions.searchPattern, regexpOpts)
-
-  let replacementsCount = 0
-
-  const newFileContent = fileContent.replace(regex, () => {
-    replacementsCount += 1
-
-    return finalOptions.searchReplacement
-  })
-
-  return {
-    newFileContent,
-    replacementsCount,
-  }
-}
-
-const replaceFileIfNecessary = async ({
-  filePath,
-  finalOptions,
-}) => {
-  const fileContent = await readFile(filePath)
-  const {
-    replacementsCount,
-    newFileContent,
-  } = replace({
-    fileContent,
-    finalOptions,
-  })
-
-  if (fileContent !== newFileContent) {
-    if (finalOptions.shouldBePreview) {
-      console.log(chalk.green(`${texts.FILE_UPDATED_PREVIEW} (x${replacementsCount}) ${filePath}`))
-    } else {
-      await writeFile(filePath, newFileContent)
-
-      console.log(chalk.green(`${texts.FILE_UPDATED} (x${replacementsCount}) ${filePath}`))
-    }
-  }
-}
 
 const getHandleFileFn = (finalOptions: T_FinalOptions) => (root, stat, next) => {
   const filePath = `${root}/${stat.name}`
@@ -100,39 +48,53 @@ const getHandleFileFn = (finalOptions: T_FinalOptions) => (root, stat, next) => 
   next()
 }
 
+const validateSearchQuestion = (value) => {
+  if (value.trim() !== "") {
+    return true
+  }
+
+  return texts.ERRORS.MISSING_SEARCH
+}
+
+const POSSIBLE_QUESTIONS: {[T_QuestionConfirmNames | T_QuestionInputNames]: () => T_Question} = {
+  path: () => ({
+    type: "input",
+    name: "path",
+    message: texts.QUESTIONS.PATH,
+    default: ".",
+  }),
+  search: () => ({
+    type: "input",
+    name: "search",
+    message: texts.QUESTIONS.SEARCH,
+    validate: validateSearchQuestion,
+  }),
+  replace: () => ({
+    type: "input",
+    name: "replace",
+    message: texts.QUESTIONS.REPLACE,
+  }),
+  confirm: () => ({
+    type: "confirm",
+    name: "confirm",
+    message: texts.QUESTIONS.CONFIRM,
+    default: false,
+  }),
+}
+
 const buildQuestions = (parsedCommandOpts) => {
   const questions: Array<T_Question> = []
 
   if (!parsedCommandOpts.searchPath) {
-    questions.push({
-      type: "input",
-      name: "path",
-      message: texts.QUESTIONS.PATH,
-      default: ".",
-    })
+    questions.push(POSSIBLE_QUESTIONS.path())
   }
 
   if (!parsedCommandOpts.searchPattern) {
-    questions.push({
-      type: "input",
-      name: "search",
-      message: texts.QUESTIONS.SEARCH,
-      validate: (value) => {
-        if (value.trim() !== "") {
-          return true
-        }
-
-        return texts.ERRORS.MISSING_SEARCH
-      },
-    })
+    questions.push(POSSIBLE_QUESTIONS.search())
   }
 
   if (!parsedCommandOpts.searchReplacement) {
-    questions.push({
-      type: "input",
-      name: "replace",
-      message: texts.QUESTIONS.REPLACE,
-    })
+    questions.push(POSSIBLE_QUESTIONS.replace())
   }
 
   return questions
@@ -165,12 +127,7 @@ const logOptionsInHumanFormat = (finalOptions: T_FinalOptions) => {
 const confirmOptions = async (finalOptions) => {
   logOptionsInHumanFormat(finalOptions)
 
-  const question: T_Question = {
-    type: "confirm",
-    name: "confirm",
-    message: texts.QUESTIONS.CONFIRM,
-    default: false,
-  }
+  const question: T_Question = POSSIBLE_QUESTIONS.confirm()
   const answer = await inquirer.prompt([question])
 
   if (!answer.confirm) {
@@ -197,3 +154,12 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
 }
 
 export default handleParsedCommandOpts
+
+// istanbul ignore else
+if (global.__TEST__) {
+  handleParsedCommandOpts._test = {
+    POSSIBLE_QUESTIONS,
+    buildQuestions,
+    confirmOptions,
+  }
+}

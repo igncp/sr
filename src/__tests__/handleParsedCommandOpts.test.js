@@ -30,4 +30,55 @@ describe(_getTopDescribeText(__filename), () => {
 
     expect(mockHelpers.exitWithError.mock.calls).toEqual([[texts.ERRORS.MISSING_PATH]])
   })
+
+  describe("buildQuestions", () => {
+    const {
+      buildQuestions,
+      POSSIBLE_QUESTIONS,
+    } = handleParsedCommandOpts._test
+
+    it("returns the expected questions", () => {
+      expect(buildQuestions({})).toEqual([
+        POSSIBLE_QUESTIONS.path(),
+        POSSIBLE_QUESTIONS.search(),
+        POSSIBLE_QUESTIONS.replace(),
+      ])
+
+      expect(buildQuestions({
+        searchPath: "searchPathValue",
+        searchPattern: "searchPatternValue",
+        searchReplacement: "searchReplacementValue",
+      })).toEqual([])
+    })
+  })
+
+  describe("confirmOptions", () => {
+    const { confirmOptions } = handleParsedCommandOpts._test
+
+    beforeEach(() => {
+      jest.spyOn(process, "exit").mockImplementation(() => null)
+      jest.spyOn(console, "log").mockImplementation(() => null)
+    })
+
+    afterEach(() => {
+      process.exit.mockRestore()
+      console.log.mockRestore()
+    })
+
+    it("exits if the answer is negative", async () => {
+      mockInquirer.prompt.mockReturnValue({ confirm: false })
+
+      await confirmOptions({})
+
+      expect(process.exit.mock.calls).toEqual([[0]])
+    })
+
+    it("does not exit if the answer is positive", async () => {
+      mockInquirer.prompt.mockReturnValue({ confirm: true })
+
+      await confirmOptions({})
+
+      expect(process.exit.mock.calls).toEqual([])
+    })
+  })
 })

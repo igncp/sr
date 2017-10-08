@@ -6,7 +6,7 @@ import program from "commander"
 import handleParsedCommandOpts from "./handleParsedCommandOpts"
 import pjson from "../package"
 
-import type { T_ParsedCommandOpts } from "./handleParsedCommandOpts"
+import type { T_ParsedCommandOpts } from "./commonTypes"
 
 const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
   return {
