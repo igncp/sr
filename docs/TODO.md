@@ -14,8 +14,6 @@ None
 
 ### Infrastructure
 
-- Setup travis / circleci
-- Setup npm
 - Setup script to publish to npm bumping version
 - Add tutorial in main Readme
 - Add bigger docs
