@@ -18,4 +18,3 @@ None
 - Add tutorial in main Readme
 - Add bigger docs
 - Add dependencies (e.g. node version) in Readme
-- Setup coverage badge
