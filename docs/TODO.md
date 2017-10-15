@@ -2,15 +2,20 @@
 
 ### Fixes
 
-None
+- When an entry in list is selected, recalculate the replacements for the file
 
 ### Functionality
 
+- Improve preview message when displaying list
+  - Add keys helpers
+  - display difference
+  - Better movement
+- Add option to display entries of replacement alreay existing before
+- Add preview to list
 - Add integration tests
 - Add option to convert on the fly / convert at the end (to be able to do ctrl-c)
 - Add option for message of confirmation for all the options
 - Add option to just see the difference
-- Add option to confirm each entry
 
 ### Infrastructure
 
@@ -18,3 +23,4 @@ None
 - Add tutorial in main Readme
 - Add bigger docs
 - Add dependencies (e.g. node version) in Readme
+- Setup commit msg validator

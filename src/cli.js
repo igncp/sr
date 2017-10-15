@@ -16,6 +16,7 @@ const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
     shouldBeCaseSensitive: !parsedProgram.caseInsensitive,
     shouldBePreview: !!parsedProgram.preview,
     shouldConfirmOptions: !!parsedProgram.confirm,
+    shouldUseList: !!parsedProgram.list,
   }
 }
 
@@ -24,8 +25,9 @@ const main = () => {
     .version(pjson.version)
     .usage("[options] <searchPath searchPattern replacementString>")
     .option("-i, --case-insensitive", "case insensitive search [default=false]")
-    .option("-p, --preview", "preview results without modifying files [default=false]")
+    .option("-p, --preview", "preview results without modifying files (not applicable to list) [default=false]")
     .option("-c, --confirm", "confirm selection of options [default=false]")
+    .option("-l, --list", "select replacements using an interactive list (no preview)")
     .parse(process.argv)
 
   const commandOpts = extractCommandOpts(program)

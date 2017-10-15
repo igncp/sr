@@ -10,19 +10,32 @@ import {
 
 import type { T_FinalOptions } from "./commonTypes"
 
+export const replaceWithCb: any = ({
+  finalOptions,
+  fileContent,
+  cb,
+}) => {
+  const defaultOpts = "mg"
+  const regexpOpts = finalOptions.shouldBeCaseSensitive ? defaultOpts : `i${defaultOpts}`
+  const regex = new RegExp(finalOptions.searchPattern, regexpOpts)
+
+  return fileContent.replace(regex, cb)
+}
+
 const replace = ({
   fileContent,
   finalOptions,
 }) => {
-  const regexpOpts = `g${finalOptions.shouldBeCaseSensitive ? "" : "i"}`
-  const regex = new RegExp(finalOptions.searchPattern, regexpOpts)
-
   let replacementsCount = 0
 
-  const newFileContent = fileContent.replace(regex, () => {
-    replacementsCount += 1
+  const newFileContent = replaceWithCb({
+    finalOptions,
+    fileContent,
+    cb: () => {
+      replacementsCount += 1
 
-    return finalOptions.searchReplacement
+      return finalOptions.searchReplacement
+    },
   })
 
   return {
@@ -50,13 +63,24 @@ const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
   })
 
   if (fileContent !== newFileContent) {
+    if (finalOptions.shouldUseList) {
+      finalOptions.replacementsCollection.push({
+        filePath,
+        replacementsCount,
+      })
+
+      return
+    }
+
     if (finalOptions.shouldBePreview) {
       console.log(chalk.green(`${texts.FILE_UPDATED_PREVIEW} (x${replacementsCount}) ${filePath}`))
-    } else {
-      await writeFile(filePath, newFileContent)
 
-      console.log(chalk.green(`${texts.FILE_UPDATED} (x${replacementsCount}) ${filePath}`))
+      return
     }
+
+    await writeFile(filePath, newFileContent)
+
+    console.log(chalk.green(`${texts.FILE_UPDATED} (x${replacementsCount}) ${filePath}`))
   }
 }
 

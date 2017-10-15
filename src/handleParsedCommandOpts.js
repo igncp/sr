@@ -6,9 +6,8 @@ import walk from "walk"
 import inquirer from "inquirer"
 
 import texts from "./texts"
-import {
-  exitWithError,
-} from "./helpers"
+import { exitWithError } from "./helpers"
+import displayTermList from "./termList"
 import type {
   T_FinalOptions,
   T_ParsedCommandOpts,
@@ -40,10 +39,12 @@ type T_Question = ExactSpreadWorkaround<{|
 const getHandleFileFn = (finalOptions: T_FinalOptions) => (root, stat, next) => {
   const filePath = `${root}/${stat.name}`
 
-  replaceFileIfNecessary({
+  const promise = replaceFileIfNecessary({
     filePath,
     finalOptions,
   })
+
+  finalOptions.replacementsPromises.push(promise)
 
   next()
 }
@@ -102,14 +103,19 @@ const buildQuestions = (parsedCommandOpts) => {
 
 const buildFinalOptions = (parsedCommandOpts, answers): T_FinalOptions => {
   const searchPath = (parsedCommandOpts.searchPath || answers.path || "").replace(/\/$/, "")
+  const replacementsCollection = []
+  const replacementsPromises = []
 
   return {
+    replacementsCollection,
+    replacementsPromises,
     searchPath,
     searchPattern: parsedCommandOpts.searchPattern || answers.search,
     searchReplacement: parsedCommandOpts.searchReplacement || answers.replace,
     shouldBeCaseSensitive: parsedCommandOpts.shouldBeCaseSensitive,
     shouldBePreview: parsedCommandOpts.shouldBePreview,
     shouldConfirmOptions: parsedCommandOpts.shouldConfirmOptions,
+    shouldUseList: parsedCommandOpts.shouldUseList,
   }
 }
 
@@ -135,6 +141,16 @@ const confirmOptions = async (finalOptions) => {
   }
 }
 
+const getHandleEndFn = finalOptions => async () => {
+  await Promise.all(finalOptions.replacementsPromises)
+
+  if (finalOptions.shouldUseList) {
+    await displayTermList({
+      finalOptions,
+    })
+  }
+}
+
 const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandOpts) => {
   const questions = buildQuestions(parsedCommandOpts)
   const answers = await inquirer.prompt(questions)
@@ -149,8 +165,10 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
   const resolvedSearchPath = path.resolve(finalOptions.searchPath)
   const walker = walk.walk(resolvedSearchPath, { followLinks: false })
   const handleFile = getHandleFileFn(finalOptions)
+  const handleEnd = getHandleEndFn(finalOptions)
 
   walker.on("file", handleFile)
+  walker.on("end", handleEnd)
 }
 
 export default handleParsedCommandOpts
