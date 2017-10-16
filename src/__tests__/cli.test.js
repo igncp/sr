@@ -35,8 +35,9 @@ describe(_getTopDescribeText(__filename), () => {
     expect(mockCommander.version.mock.calls).toEqual([[pjson.version]])
     expect(mockCommander.option.mock.calls).toEqual([
       ["-i, --case-insensitive", "case insensitive search [default=false]"],
-      ["-p, --preview", "preview results without modifying files [default=false]"],
+      ["-p, --preview", "preview results without modifying files (not applicable to list) [default=false]"],
       ["-c, --confirm", "confirm selection of options [default=false]"],
+      ["-l, --list", "select replacements using an interactive list (no preview)"],
     ])
     expect(mockCommander.usage.mock.calls).toEqual([["[options] <searchPath searchPattern replacementString>"]])
     expect(mockCommander.parse.mock.calls).toEqual([["processArgvValue"]])
@@ -52,6 +53,7 @@ describe(_getTopDescribeText(__filename), () => {
       shouldBeCaseSensitive: true,
       shouldBePreview: false,
       shouldConfirmOptions: false,
+      shouldUseList: false,
     }]])
   })
 })

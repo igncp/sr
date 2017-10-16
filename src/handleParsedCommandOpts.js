@@ -179,5 +179,8 @@ if (global.__TEST__) {
     POSSIBLE_QUESTIONS,
     buildQuestions,
     confirmOptions,
+    getHandleEndFn,
+    getHandleFileFn,
+    validateSearchQuestion,
   }
 }

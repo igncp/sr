@@ -31,6 +31,29 @@ describe(_getTopDescribeText(__filename), () => {
     expect(mockHelpers.writeFile.mock.calls).toEqual([["filePathValue", "fileContentNewValue"]])
   })
 
+  it("calls the expected functions when passing a valid change with shouldUseList", async () => {
+    mockHelpers.readFile.mockReturnValue("fileContentValue")
+
+    const replacementsCollection = []
+
+    await replaceFileIfNecessary({
+      filePath: "filePathValue",
+      finalOptions: {
+        replacementsCollection,
+        searchPattern: "Value",
+        searchReplacement: "NewValue",
+        shouldUseList: true,
+      },
+    })
+
+    expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
+    expect(mockHelpers.writeFile.mock.calls).toEqual([])
+    expect(replacementsCollection).toEqual([{
+      filePath: "filePathValue",
+      replacementsCount: 1,
+    }])
+  })
+
   it("calls the expected functions when passing a valid change with preview", async () => {
     mockHelpers.readFile.mockReturnValue("fileContentValue")
 

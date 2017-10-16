@@ -1,9 +1,11 @@
 // @flow
 
-import fs from "fs"
-
 import { replaceWithCb } from "../replaceFileIfNecessary"
 import type { T_FinalOptions } from "../commonTypes"
+import {
+  readFile,
+  writeFile,
+} from "../helpers"
 
 import setupTerminalListUI from "./setupTerminalListUI"
 
@@ -67,7 +69,8 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
 
     let localReplacementIndex = -1
 
-    const fileContent = fs.readFileSync(filePath, "utf-8")
+    const fileContent = await readFile(filePath)
+
     const newFileContent = replaceWithCb({
       finalOptions,
       fileContent,
@@ -96,7 +99,8 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
 
     let localReplacementIndex = -1
 
-    const fileContent = fs.readFileSync(filePath, "utf-8")
+    const fileContent = await readFile(filePath)
+
     const newFileContent = replaceWithCb({
       finalOptions,
       fileContent,
@@ -111,7 +115,7 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
       },
     })
 
-    fs.writeFileSync(filePath, newFileContent)
+    await writeFile(filePath, newFileContent)
 
     replacementsEntries.splice(itemIndex, 1)
 
