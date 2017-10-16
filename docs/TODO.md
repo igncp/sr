@@ -19,6 +19,7 @@
 
 ### Infrastructure
 
+- Reduce `any` annotations in src (not in modules)
 - Setup script to publish to npm bumping version
 - Add tutorial in main Readme
 - Add bigger docs

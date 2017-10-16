@@ -17,3 +17,7 @@ declare module "chalk" {
 declare module "inquirer" {
   declare export default any
 }
+
+declare module "blessed" {
+  declare export default any
+}

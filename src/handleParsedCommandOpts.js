@@ -7,7 +7,7 @@ import inquirer from "inquirer"
 
 import texts from "./texts"
 import { exitWithError } from "./helpers"
-import displayTermList from "./termList"
+import handleReplacementsInList from "./listOption/handleReplacementsInList"
 import type {
   T_FinalOptions,
   T_ParsedCommandOpts,
@@ -145,7 +145,7 @@ const getHandleEndFn = finalOptions => async () => {
   await Promise.all(finalOptions.replacementsPromises)
 
   if (finalOptions.shouldUseList) {
-    await displayTermList({
+    await handleReplacementsInList({
       finalOptions,
     })
   }
