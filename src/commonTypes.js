@@ -10,11 +10,13 @@ export type T_ParsedCommandOpts = ExactSpreadWorkaround<{|
   shouldUseList: boolean,
 |}>
 
+export type T_ReplacementsCollection = Array<{|
+  replacementsCount: number,
+  filePath: string,
+|}>
+
 export type T_FinalOptions = ExactSpreadWorkaround<{|
   ...T_ParsedCommandOpts,
   replacementsPromises: Promise<void>[],
-  replacementsCollection: Array<{|
-    replacementsCount: number,
-    filePath: string,
-  |}>,
+  replacementsCollection: T_ReplacementsCollection,
 |}>

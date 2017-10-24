@@ -7,7 +7,7 @@ import inquirer from "inquirer"
 
 import texts from "./texts"
 import { exitWithError } from "./helpers"
-import handleReplacementsInList from "./listOption/handleReplacementsInList"
+import handleReplacementsInList from "./listOption/handleReplacementsInList/handleReplacementsInList"
 import type {
   T_FinalOptions,
   T_ParsedCommandOpts,

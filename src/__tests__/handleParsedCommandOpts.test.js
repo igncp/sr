@@ -15,7 +15,7 @@ const mockReplaceFileIfNecessary = jest.fn()
 jest.mock("walk", () => mockWalk)
 jest.mock("inquirer", () => mockInquirer)
 jest.mock("../helpers", () => mockHelpers)
-jest.mock("../listOption/handleReplacementsInList", () => mockHandleReplacementsInList)
+jest.mock("../listOption/handleReplacementsInList/handleReplacementsInList", () => mockHandleReplacementsInList)
 jest.mock("../replaceFileIfNecessary", () => mockReplaceFileIfNecessary)
 
 beforeEach(() => {

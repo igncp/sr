@@ -1,57 +1,23 @@
 // @flow
 
-import { replaceWithCb } from "../replaceFileIfNecessary"
-import type { T_FinalOptions } from "../commonTypes"
+import { replaceWithCb } from "../../replaceFileIfNecessary"
+import type { T_FinalOptions } from "../../commonTypes"
 import {
   readFile,
   writeFile,
-} from "../helpers"
+} from "../../helpers"
 
-import setupTerminalListUI from "./setupTerminalListUI"
+import setupTerminalListUI from "../setupTerminalListUI/setupTerminalListUI"
+
+import {
+  createReplacementEntriesFromReplacementsCollection,
+  resetReplacementIndex,
+} from "./handleReplacementsInListHelpers"
+import type { T_ReplacementEntry } from "./handleReplacementsInList.types"
 
 type T_handleReplacementsInList = ({
   finalOptions: T_FinalOptions,
 }) => Promise<{}>
-
-type T_ReplacementEntry = {|
-  filePath: string,
-  id: number,
-  replacementIndex: number,
-  replacementsCount: number,
-|}
-
-// this function assumes that the replacementsEntries are sorted by filePath
-const resetReplacementIndex = ({
-  replacementsEntries,
-}) => {
-  let lastReplacementIndex = 0
-  let lastItemFilepath = ""
-
-  replacementsEntries.forEach((item) => {
-    if (lastItemFilepath !== item.filePath) {
-      lastReplacementIndex = 0
-    } else {
-      lastReplacementIndex += 1
-    }
-
-    lastItemFilepath = item.filePath
-
-    item.replacementIndex = lastReplacementIndex
-  })
-}
-
-const createReplacementEntriesFromReplacementsCollection = (replacementsCollection) => {
-  return replacementsCollection.reduce((acc, replacement) => {
-    for (let i = 0; i < replacement.replacementsCount; i++) {
-      acc.push(Object.assign({}, replacement, {
-        id: acc.length,
-        replacementIndex: i,
-      }))
-    }
-
-    return acc
-  }, [])
-}
 
 const handleReplacementsInList: T_handleReplacementsInList = ({
   finalOptions,
