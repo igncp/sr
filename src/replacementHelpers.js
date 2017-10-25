@@ -6,18 +6,26 @@ import texts from "./texts"
 import {
   readFile,
   writeFile,
-} from "./helpers"
+} from "./utils/io"
 
 import type { T_FinalOptions } from "./commonTypes"
 
-export const replaceWithCb: any = ({
-  finalOptions,
+type T_replaceWithCb = ({
+  shouldBeCaseSensitive: boolean,
+  searchPattern: string,
+  fileContent: string,
+  cb: Function,
+}) => string
+
+export const replaceWithCb: T_replaceWithCb = ({
+  shouldBeCaseSensitive,
+  searchPattern,
   fileContent,
   cb,
 }) => {
   const defaultOpts = "mg"
-  const regexpOpts = finalOptions.shouldBeCaseSensitive ? defaultOpts : `i${defaultOpts}`
-  const regex = new RegExp(finalOptions.searchPattern, regexpOpts)
+  const regexpOpts = shouldBeCaseSensitive ? defaultOpts : `i${defaultOpts}`
+  const regex = new RegExp(searchPattern, regexpOpts)
 
   return fileContent.replace(regex, cb)
 }
@@ -29,7 +37,8 @@ const replace = ({
   let replacementsCount = 0
 
   const newFileContent = replaceWithCb({
-    finalOptions,
+    searchPattern: finalOptions.searchPattern,
+    shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
     fileContent,
     cb: () => {
       replacementsCount += 1
@@ -49,7 +58,7 @@ type T_replaceFileIfNecessary = ({
   finalOptions: T_FinalOptions,
 }) => Promise<void>
 
-const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
+export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
   filePath,
   finalOptions,
 }) => {
@@ -86,9 +95,7 @@ const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
 
 // istanbul ignore else
 if (global.__TEST__) {
-  replaceFileIfNecessary._test = {
+  module.exports._test = {
     replace,
   }
 }
-
-export default replaceFileIfNecessary

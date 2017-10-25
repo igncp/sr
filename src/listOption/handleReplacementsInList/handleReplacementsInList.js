@@ -1,11 +1,11 @@
 // @flow
 
-import { replaceWithCb } from "../../replaceFileIfNecessary"
+import { replaceWithCb } from "../../replacementHelpers"
 import type { T_FinalOptions } from "../../commonTypes"
 import {
   readFile,
   writeFile,
-} from "../../helpers"
+} from "../../utils/io"
 
 import setupTerminalListUI from "../setupTerminalListUI/setupTerminalListUI"
 
@@ -38,7 +38,8 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
     const fileContent = await readFile(filePath)
 
     const newFileContent = replaceWithCb({
-      finalOptions,
+      searchPattern: finalOptions.searchPattern,
+      shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
       fileContent,
       cb: (original) => {
         localReplacementIndex++
@@ -68,7 +69,8 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
     const fileContent = await readFile(filePath)
 
     const newFileContent = replaceWithCb({
-      finalOptions,
+      shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
+      searchPattern: finalOptions.searchPattern,
       fileContent,
       cb: (original) => {
         localReplacementIndex++

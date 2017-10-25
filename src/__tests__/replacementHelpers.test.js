@@ -1,9 +1,9 @@
-const mockHelpers = {
+const mockIO = {
   writeFile: jest.fn(),
   readFile: jest.fn(),
 }
 
-jest.mock("../helpers", () => mockHelpers)
+jest.mock("../utils/io", () => mockIO)
 
 beforeEach(() => {
   jest.spyOn(console, "log").mockImplementation(() => null)
@@ -14,10 +14,13 @@ afterEach(() => {
 })
 
 describe(_getTopDescribeText(__filename), () => {
-  const replaceFileIfNecessary = require("../replaceFileIfNecessary").default
+  const {
+    replaceFileIfNecessary,
+    _test,
+  } = require("../replacementHelpers")
 
   it("calls the expected functions when passing a valid change without preview", async () => {
-    mockHelpers.readFile.mockReturnValue("fileContentValue")
+    mockIO.readFile.mockReturnValue("fileContentValue")
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
@@ -27,12 +30,12 @@ describe(_getTopDescribeText(__filename), () => {
       },
     })
 
-    expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
-    expect(mockHelpers.writeFile.mock.calls).toEqual([["filePathValue", "fileContentNewValue"]])
+    expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
+    expect(mockIO.writeFile.mock.calls).toEqual([["filePathValue", "fileContentNewValue"]])
   })
 
   it("calls the expected functions when passing a valid change with shouldUseList", async () => {
-    mockHelpers.readFile.mockReturnValue("fileContentValue")
+    mockIO.readFile.mockReturnValue("fileContentValue")
 
     const replacementsCollection = []
 
@@ -46,8 +49,8 @@ describe(_getTopDescribeText(__filename), () => {
       },
     })
 
-    expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
-    expect(mockHelpers.writeFile.mock.calls).toEqual([])
+    expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
+    expect(mockIO.writeFile.mock.calls).toEqual([])
     expect(replacementsCollection).toEqual([{
       filePath: "filePathValue",
       replacementsCount: 1,
@@ -55,7 +58,7 @@ describe(_getTopDescribeText(__filename), () => {
   })
 
   it("calls the expected functions when passing a valid change with preview", async () => {
-    mockHelpers.readFile.mockReturnValue("fileContentValue")
+    mockIO.readFile.mockReturnValue("fileContentValue")
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
@@ -66,12 +69,12 @@ describe(_getTopDescribeText(__filename), () => {
       },
     })
 
-    expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
-    expect(mockHelpers.writeFile.mock.calls).toEqual([])
+    expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
+    expect(mockIO.writeFile.mock.calls).toEqual([])
   })
 
   it("calls the expected functions when passing a no-change", async () => {
-    mockHelpers.readFile.mockReturnValue("fileContentValue")
+    mockIO.readFile.mockReturnValue("fileContentValue")
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
@@ -82,12 +85,12 @@ describe(_getTopDescribeText(__filename), () => {
       },
     })
 
-    expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
-    expect(mockHelpers.writeFile.mock.calls).toEqual([])
+    expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
+    expect(mockIO.writeFile.mock.calls).toEqual([])
   })
 
   describe("replace", () => {
-    const { replace } = replaceFileIfNecessary._test
+    const { replace } = _test
 
     it("replaces case insensitive when expected", () => {
       const result = replace({

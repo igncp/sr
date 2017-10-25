@@ -1,7 +1,7 @@
-const mockReplaceFileIfNecessary = {
+const mockReplacementHelpers = {
   replaceWithCb: jest.fn(),
 }
-const mockHelpers = {
+const mockIO = {
   writeFile: jest.fn(),
   readFile: jest.fn(),
 }
@@ -11,13 +11,13 @@ const mockHandleReplacementsInListHelpers = {
   resetReplacementIndex: jest.fn(),
 }
 
-jest.mock("../../../helpers", () => mockHelpers)
+jest.mock("../../../utils/io", () => mockIO)
 jest.mock("../../setupTerminalListUI/setupTerminalListUI", () => mockSetupTerminalListUI)
-jest.mock("../../../replaceFileIfNecessary", () => mockReplaceFileIfNecessary)
+jest.mock("../../../replacementHelpers", () => mockReplacementHelpers)
 jest.mock("../handleReplacementsInListHelpers", () => mockHandleReplacementsInListHelpers)
 
 beforeEach(() => {
-  mockHelpers.readFile.mockReturnValue("readFileContent")
+  mockIO.readFile.mockReturnValue("readFileContent")
 })
 
 describe(_getTopDescribeText(__filename), () => {
@@ -33,12 +33,14 @@ describe(_getTopDescribeText(__filename), () => {
         replacementIndex,
         replacementsCount: "replacementsCountValue",
       }])
-    mockReplaceFileIfNecessary.replaceWithCb.mockReturnValue("replaceWithCbResult")
+    mockReplacementHelpers.replaceWithCb.mockReturnValue("replaceWithCbResult")
 
     handleReplacementsInList({
       finalOptions: {
         replacementsCollection: [],
+        searchPattern: "searchPatternValue",
         searchReplacement: "searchReplacementValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
       },
     })
   }
@@ -68,15 +70,13 @@ describe(_getTopDescribeText(__filename), () => {
         itemIndex: 0,
       })
 
-      expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
+      expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
       expect(result).toEqual("replaceWithCbResult")
-      expect(mockReplaceFileIfNecessary.replaceWithCb.mock.calls).toEqual([[{
+      expect(mockReplacementHelpers.replaceWithCb.mock.calls).toEqual([[{
         cb: expect.any(Function),
         fileContent: "readFileContent",
-        finalOptions: {
-          replacementsCollection: [],
-          searchReplacement: "searchReplacementValue",
-        },
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
       }]])
     })
 
@@ -91,7 +91,7 @@ describe(_getTopDescribeText(__filename), () => {
         itemIndex: 0,
       })
 
-      const { cb } = mockReplaceFileIfNecessary.replaceWithCb.mock.calls[0][0]
+      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
 
       const cbResult = cb("originalValue")
 
@@ -109,7 +109,7 @@ describe(_getTopDescribeText(__filename), () => {
         itemIndex: 0,
       })
 
-      const { cb } = mockReplaceFileIfNecessary.replaceWithCb.mock.calls[0][0]
+      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
 
       const cbResult = cb("originalValue")
 
@@ -129,19 +129,17 @@ describe(_getTopDescribeText(__filename), () => {
         removeItem,
       })
 
-      expect(mockHelpers.readFile.mock.calls).toEqual([["filePathValue"]])
-      expect(mockHelpers.writeFile.mock.calls).toEqual([["filePathValue", "replaceWithCbResult"]])
+      expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
+      expect(mockIO.writeFile.mock.calls).toEqual([["filePathValue", "replaceWithCbResult"]])
       expect(removeItem.mock.calls).toEqual([[]])
       expect(mockHandleReplacementsInListHelpers.resetReplacementIndex.mock.calls).toEqual([[{
         replacementsEntries: [],
       }]])
-      expect(mockReplaceFileIfNecessary.replaceWithCb.mock.calls).toEqual([[{
+      expect(mockReplacementHelpers.replaceWithCb.mock.calls).toEqual([[{
         cb: expect.any(Function),
         fileContent: "readFileContent",
-        finalOptions: {
-          replacementsCollection: [],
-          searchReplacement: "searchReplacementValue",
-        },
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
       }]])
     })
 
@@ -158,7 +156,7 @@ describe(_getTopDescribeText(__filename), () => {
         removeItem,
       })
 
-      const { cb } = mockReplaceFileIfNecessary.replaceWithCb.mock.calls[0][0]
+      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
 
       const result = cb("textValue")
 
@@ -178,7 +176,7 @@ describe(_getTopDescribeText(__filename), () => {
         removeItem,
       })
 
-      const { cb } = mockReplaceFileIfNecessary.replaceWithCb.mock.calls[0][0]
+      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
 
       const result = cb("textValue")
 
