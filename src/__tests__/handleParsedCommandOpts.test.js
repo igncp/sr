@@ -25,10 +25,12 @@ describe(_getTopDescribeText(__filename), () => {
     it("calls the expected functions when shouldUseList", async () => {
       const finalOptions = {
         shouldUseList: true,
-        replacementsPromises: ["promiseValue"],
       }
 
-      await getHandleEndFn(finalOptions)()
+      await getHandleEndFn({
+        finalOptions,
+        fileReplacementPromises: [],
+      })()
 
       expect(mockHandleReplacementsInList.mock.calls).toEqual([[{
         finalOptions,
@@ -38,10 +40,13 @@ describe(_getTopDescribeText(__filename), () => {
     it("calls the expected functions when !shouldUseList", async () => {
       const finalOptions = {
         shouldUseList: false,
-        replacementsPromises: ["promiseValue"],
       }
+      const fileReplacementPromises = ["promiseValue"]
 
-      await getHandleEndFn(finalOptions)()
+      await getHandleEndFn({
+        finalOptions,
+        fileReplacementPromises,
+      })()
 
       expect(mockHandleReplacementsInList.mock.calls).toEqual([])
     })
@@ -52,10 +57,13 @@ describe(_getTopDescribeText(__filename), () => {
       const p2 = new Promise(r => setTimeout(r, 1))
       const finalOptions = {
         shouldUseList: true,
-        replacementsPromises: [p1, p2],
       }
+      const fileReplacementPromises = [p1, p2]
 
-      const p = getHandleEndFn(finalOptions)()
+      const p = getHandleEndFn({
+        finalOptions,
+        fileReplacementPromises,
+      })()
 
       expect(isResolved).toEqual(false)
       expect(mockHandleReplacementsInList.mock.calls).toEqual([])
@@ -76,21 +84,32 @@ describe(_getTopDescribeText(__filename), () => {
       mockReplacementHelpers.replaceFileIfNecessary.mockReturnValue("replacementValue")
 
       const next = jest.fn()
-      const replacementsPromises = []
+      const onFileReplacementPromise = jest.fn()
 
       getHandleFileFn({
-        replacementsPromises,
+        finalOptions: {
+          replacementsCollection: [],
+          searchPattern: "searchPatternValue",
+          searchReplacement: "searchReplacementValue",
+          shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+          shouldBePreview: "shouldBePreviewValue",
+          shouldUseList: "shouldUseListValue",
+        },
+        onFileReplacementPromise,
       })("rootValue", { name: "statValue" }, next)
 
       expect(next.mock.calls).toEqual([[]])
-      expect(replacementsPromises).toEqual(["replacementValue"])
+      expect(onFileReplacementPromise.mock.calls).toEqual([[{
+        fileReplacementPromise: "replacementValue",
+      }]])
       expect(mockReplacementHelpers.replaceFileIfNecessary.mock.calls).toEqual([[{
         filePath: "rootValue/statValue",
-        finalOptions: {
-          replacementsPromises: [
-            "replacementValue",
-          ],
-        },
+        replacementsCollection: [],
+        searchPattern: "searchPatternValue",
+        searchReplacement: "searchReplacementValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+        shouldBePreview: "shouldBePreviewValue",
+        shouldUseList: "shouldUseListValue",
       }]])
     })
   })

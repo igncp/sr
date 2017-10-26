@@ -32,18 +32,20 @@ export const replaceWithCb: T_replaceWithCb = ({
 
 const replace = ({
   fileContent,
-  finalOptions,
+  searchPattern,
+  searchReplacement,
+  shouldBeCaseSensitive,
 }) => {
   let replacementsCount = 0
 
   const newFileContent = replaceWithCb({
-    searchPattern: finalOptions.searchPattern,
-    shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
+    searchPattern,
+    shouldBeCaseSensitive,
     fileContent,
     cb: () => {
       replacementsCount += 1
 
-      return finalOptions.searchReplacement
+      return searchReplacement
     },
   })
 
@@ -55,12 +57,22 @@ const replace = ({
 
 type T_replaceFileIfNecessary = ({
   filePath: string,
-  finalOptions: T_FinalOptions,
+  replacementsCollection: any[],
+  searchPattern: string,
+  searchReplacement: string,
+  shouldBeCaseSensitive: boolean,
+  shouldBePreview: boolean,
+  shouldUseList: boolean,
 }) => Promise<void>
 
 export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
   filePath,
-  finalOptions,
+  replacementsCollection,
+  searchPattern,
+  searchReplacement,
+  shouldBeCaseSensitive,
+  shouldBePreview,
+  shouldUseList,
 }) => {
   const fileContent = await readFile(filePath)
   const {
@@ -68,12 +80,14 @@ export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
     newFileContent,
   } = replace({
     fileContent,
-    finalOptions,
+    searchPattern,
+    searchReplacement,
+    shouldBeCaseSensitive,
   })
 
   if (fileContent !== newFileContent) {
-    if (finalOptions.shouldUseList) {
-      finalOptions.replacementsCollection.push({
+    if (shouldUseList) {
+      replacementsCollection.push({
         filePath,
         replacementsCount,
       })
@@ -81,7 +95,7 @@ export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
       return
     }
 
-    if (finalOptions.shouldBePreview) {
+    if (shouldBePreview) {
       console.log(chalk.green(`${texts.FILE_UPDATED_PREVIEW} (x${replacementsCount}) ${filePath}`))
 
       return

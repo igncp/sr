@@ -24,10 +24,8 @@ describe(_getTopDescribeText(__filename), () => {
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
-      finalOptions: {
-        searchPattern: "Value",
-        searchReplacement: "NewValue",
-      },
+      searchPattern: "Value",
+      searchReplacement: "NewValue",
     })
 
     expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
@@ -41,12 +39,10 @@ describe(_getTopDescribeText(__filename), () => {
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
-      finalOptions: {
-        replacementsCollection,
-        searchPattern: "Value",
-        searchReplacement: "NewValue",
-        shouldUseList: true,
-      },
+      replacementsCollection,
+      searchPattern: "Value",
+      searchReplacement: "NewValue",
+      shouldUseList: true,
     })
 
     expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
@@ -62,11 +58,9 @@ describe(_getTopDescribeText(__filename), () => {
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
-      finalOptions: {
-        searchPattern: "Value",
-        searchReplacement: "NewValue",
-        shouldBePreview: true,
-      },
+      searchPattern: "Value",
+      searchReplacement: "NewValue",
+      shouldBePreview: true,
     })
 
     expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
@@ -78,11 +72,9 @@ describe(_getTopDescribeText(__filename), () => {
 
     await replaceFileIfNecessary({
       filePath: "filePathValue",
-      finalOptions: {
-        searchPattern: "Value",
-        searchReplacement: "Value",
-        shouldBePreview: true,
-      },
+      searchPattern: "Value",
+      searchReplacement: "Value",
+      shouldBePreview: true,
     })
 
     expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
@@ -95,11 +87,9 @@ describe(_getTopDescribeText(__filename), () => {
     it("replaces case insensitive when expected", () => {
       const result = replace({
         fileContent: "contentValue",
-        finalOptions: {
-          shouldBeCaseSensitive: false,
-          searchPattern: "value",
-          searchReplacement: "Replacement",
-        },
+        shouldBeCaseSensitive: false,
+        searchPattern: "value",
+        searchReplacement: "Replacement",
       })
 
       expect(result).toEqual({
@@ -111,11 +101,9 @@ describe(_getTopDescribeText(__filename), () => {
     it("replaces case sensitive when expected", () => {
       const result = replace({
         fileContent: "contentValue",
-        finalOptions: {
-          shouldBeCaseSensitive: true,
-          searchPattern: "value",
-          searchReplacement: "Replacement",
-        },
+        searchPattern: "value",
+        searchReplacement: "Replacement",
+        shouldBeCaseSensitive: true,
       })
 
       expect(result).toEqual({

@@ -17,6 +17,5 @@ export type T_ReplacementsCollection = Array<{|
 
 export type T_FinalOptions = ExactSpreadWorkaround<{|
   ...T_ParsedCommandOpts,
-  replacementsPromises: Promise<void>[],
   replacementsCollection: T_ReplacementsCollection,
 |}>

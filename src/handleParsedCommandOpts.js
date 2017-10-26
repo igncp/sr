@@ -20,15 +20,25 @@ import {
 
 type T_handleParsedCommandOpts = (opts: T_ParsedCommandOpts) => Promise<void>
 
-const getHandleFileFn = (finalOptions: T_FinalOptions) => (root, stat, next) => {
+const getHandleFileFn = ({
+  finalOptions,
+  onFileReplacementPromise,
+}) => (root, stat, next) => {
   const filePath = `${root}/${stat.name}`
 
-  const promise = replaceFileIfNecessary({
+  const fileReplacementPromise = replaceFileIfNecessary({
     filePath,
-    finalOptions,
+    replacementsCollection: finalOptions.replacementsCollection,
+    searchPattern: finalOptions.searchPattern,
+    searchReplacement: finalOptions.searchReplacement,
+    shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
+    shouldBePreview: finalOptions.shouldBePreview,
+    shouldUseList: finalOptions.shouldUseList,
   })
 
-  finalOptions.replacementsPromises.push(promise)
+  onFileReplacementPromise({
+    fileReplacementPromise,
+  })
 
   next()
 }
@@ -36,11 +46,9 @@ const getHandleFileFn = (finalOptions: T_FinalOptions) => (root, stat, next) => 
 const buildFinalOptions = (parsedCommandOpts, answers): T_FinalOptions => {
   const searchPath = (parsedCommandOpts.searchPath || answers.path || "").replace(/\/$/, "")
   const replacementsCollection = []
-  const replacementsPromises = []
 
   return {
     replacementsCollection,
-    replacementsPromises,
     searchPath,
     searchPattern: parsedCommandOpts.searchPattern || answers.search,
     searchReplacement: parsedCommandOpts.searchReplacement || answers.replace,
@@ -57,8 +65,11 @@ const validateFinalOptions = (finalOptions) => {
   }
 }
 
-const getHandleEndFn = finalOptions => async () => {
-  await Promise.all(finalOptions.replacementsPromises)
+const getHandleEndFn = ({
+  fileReplacementPromises,
+  finalOptions,
+}) => async () => {
+  await Promise.all(fileReplacementPromises)
 
   if (finalOptions.shouldUseList) {
     await handleReplacementsInList({
@@ -78,9 +89,22 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
   }
 
   const resolvedSearchPath = path.resolve(finalOptions.searchPath)
+
   const walker = walk.walk(resolvedSearchPath, { followLinks: false })
-  const handleFile = getHandleFileFn(finalOptions)
-  const handleEnd = getHandleEndFn(finalOptions)
+
+  const fileReplacementPromises = []
+
+  const handleFile = getHandleFileFn({
+    finalOptions,
+    onFileReplacementPromise: ({
+      fileReplacementPromise,
+    }) => { fileReplacementPromises.push(fileReplacementPromise) },
+  })
+
+  const handleEnd = getHandleEndFn({
+    finalOptions,
+    fileReplacementPromises,
+  })
 
   walker.on("file", handleFile)
   walker.on("end", handleEnd)
