@@ -20,7 +20,7 @@ import type { T_ReplacementEntry } from "./handleReplacementsInList.types"
 
 type T_handleReplacementsInList = ({
   finalOptions: T_FinalOptions,
-  getListReplacementsCollection: () => T_ReplacementsCollection
+  getListReplacementsCollection: () => T_ReplacementsCollection,
 }) => Promise<{}>
 
 const handleReplacementsInList: T_handleReplacementsInList = ({
