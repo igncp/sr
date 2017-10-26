@@ -104,12 +104,11 @@ describe(_getTopDescribeText(__filename), () => {
       }]])
       expect(mockReplacementHelpers.replaceFileIfNecessary.mock.calls).toEqual([[{
         filePath: "rootValue/statValue",
-        replacementsCollection: [],
+        getShouldReplaceFile: expect.any(Function),
+        onFileReplaced: expect.any(Function),
         searchPattern: "searchPatternValue",
         searchReplacement: "searchReplacementValue",
         shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
-        shouldBePreview: "shouldBePreviewValue",
-        shouldUseList: "shouldUseListValue",
       }]])
     })
   })

@@ -1,6 +1,7 @@
 // @flow
 
 import path from "path"
+import chalk from "chalk"
 
 import walk from "walk"
 
@@ -26,14 +27,40 @@ const getHandleFileFn = ({
 }) => (root, stat, next) => {
   const filePath = `${root}/${stat.name}`
 
+  const getShouldReplaceFile = ({
+    replacementsCount,
+  }) => {
+    if (finalOptions.shouldUseList) {
+      finalOptions.replacementsCollection.push({
+        filePath,
+        replacementsCount,
+      })
+
+      return false
+    }
+
+    if (finalOptions.shouldBePreview) {
+      console.log(chalk.green(`${texts.FILE_UPDATED_PREVIEW} (x${replacementsCount}) ${filePath}`))
+
+      return false
+    }
+
+    return true
+  }
+
+  const onFileReplaced = ({
+    replacementsCount,
+  }) => {
+    console.log(chalk.green(`${texts.FILE_UPDATED} (x${replacementsCount}) ${filePath}`))
+  }
+
   const fileReplacementPromise = replaceFileIfNecessary({
     filePath,
-    replacementsCollection: finalOptions.replacementsCollection,
+    getShouldReplaceFile,
+    onFileReplaced,
     searchPattern: finalOptions.searchPattern,
     searchReplacement: finalOptions.searchReplacement,
     shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
-    shouldBePreview: finalOptions.shouldBePreview,
-    shouldUseList: finalOptions.shouldUseList,
   })
 
   onFileReplacementPromise({

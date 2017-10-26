@@ -1,14 +1,9 @@
 // @flow
 
-import chalk from "chalk"
-
-import texts from "./texts"
 import {
   readFile,
   writeFile,
 } from "./utils/io"
-
-import type { T_FinalOptions } from "./commonTypes"
 
 type T_replaceWithCb = ({
   shouldBeCaseSensitive: boolean,
@@ -55,24 +50,27 @@ const replace = ({
   }
 }
 
+type T_FileReplacementData = {|
+  filePath: string,
+  replacementsCount: number,
+|}
+
 type T_replaceFileIfNecessary = ({
   filePath: string,
-  replacementsCollection: any[],
+  getShouldReplaceFile: (T_FileReplacementData) => boolean,
+  onFileReplaced: (T_FileReplacementData) => void,
   searchPattern: string,
   searchReplacement: string,
   shouldBeCaseSensitive: boolean,
-  shouldBePreview: boolean,
-  shouldUseList: boolean,
 }) => Promise<void>
 
 export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
   filePath,
-  replacementsCollection,
+  getShouldReplaceFile,
+  onFileReplaced,
   searchPattern,
   searchReplacement,
   shouldBeCaseSensitive,
-  shouldBePreview,
-  shouldUseList,
 }) => {
   const fileContent = await readFile(filePath)
   const {
@@ -86,24 +84,19 @@ export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
   })
 
   if (fileContent !== newFileContent) {
-    if (shouldUseList) {
-      replacementsCollection.push({
-        filePath,
-        replacementsCount,
-      })
-
-      return
+    const fileReplacementData = {
+      filePath,
+      replacementsCount,
     }
+    const shouldReplace = getShouldReplaceFile(fileReplacementData)
 
-    if (shouldBePreview) {
-      console.log(chalk.green(`${texts.FILE_UPDATED_PREVIEW} (x${replacementsCount}) ${filePath}`))
-
+    if (!shouldReplace) {
       return
     }
 
     await writeFile(filePath, newFileContent)
 
-    console.log(chalk.green(`${texts.FILE_UPDATED} (x${replacementsCount}) ${filePath}`))
+    onFileReplaced(fileReplacementData)
   }
 }
 
