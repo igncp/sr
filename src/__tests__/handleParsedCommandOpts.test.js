@@ -1,115 +1,117 @@
-const mockWalk = {
-  walk: jest.fn(),
-}
-const mockHandleReplacementsInList = jest.fn()
-const mockReplacementHelpers = {
-  replaceFileIfNecessary: jest.fn(),
-}
+import texts from "../texts"
 
-jest.mock("walk", () => mockWalk)
-jest.mock("../listOption/handleReplacementsInList/handleReplacementsInList", () => mockHandleReplacementsInList)
-jest.mock("../replacementHelpers", () => mockReplacementHelpers)
+const mockLifecycle = {
+  exitWithError: jest.fn(),
+}
+const mockPromptInteractions = {
+  getAnswersForFinalOptions: jest.fn(),
+  confirmOptions: jest.fn(),
+}
+const mockWalkFilesForReplacements = jest.fn()
 
-beforeEach(() => {
-  mockWalk.walk.mockImplementation(() => ({
-    on: jest.fn(),
-  }))
-})
+jest.mock("../walkFilesForReplacements", () => mockWalkFilesForReplacements)
+jest.mock("../promptInteractions", () => mockPromptInteractions)
+jest.mock("../utils/lifecycle", () => mockLifecycle)
 
 describe(_getTopDescribeText(__filename), () => {
   const handleParsedCommandOpts = require("../handleParsedCommandOpts").default
 
-  describe("handleEnd", () => {
-    const { getHandleEndFn } = handleParsedCommandOpts._test
+  it("calls the expected functions when it should confirm options", async () => {
+    mockPromptInteractions.getAnswersForFinalOptions.mockReturnValue({})
 
-    it("calls the expected functions when shouldUseList", async () => {
-      const finalOptions = {
-        shouldUseList: true,
-      }
+    const parsedCommandOpts = {
+      searchPath: "searchPathValue",
+      searchPattern: "searchAnswerValue",
+      searchReplacement: "searchReplacementValue",
+      shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+      shouldBePreview: "shouldBePreviewValue",
+      shouldConfirmOptions: true,
+      shouldUseList: "shouldUseListValue",
+    }
 
-      await getHandleEndFn({
-        finalOptions,
-        fileReplacementPromises: [],
-      })()
+    const expectedFinalOptions = Object.assign({}, parsedCommandOpts)
 
-      expect(mockHandleReplacementsInList.mock.calls).toEqual([[{
-        finalOptions,
-      }]])
-    })
+    await handleParsedCommandOpts(parsedCommandOpts)
 
-    it("calls the expected functions when !shouldUseList", async () => {
-      const finalOptions = {
-        shouldUseList: false,
-      }
-      const fileReplacementPromises = ["promiseValue"]
-
-      await getHandleEndFn({
-        finalOptions,
-        fileReplacementPromises,
-      })()
-
-      expect(mockHandleReplacementsInList.mock.calls).toEqual([])
-    })
-
-    it("waits for the promises to finish", async () => {
-      let isResolved = false
-      const p1 = new Promise(r => setTimeout(r, 5)).then(() => {isResolved = true})
-      const p2 = new Promise(r => setTimeout(r, 1))
-      const finalOptions = {
-        shouldUseList: true,
-      }
-      const fileReplacementPromises = [p1, p2]
-
-      const p = getHandleEndFn({
-        finalOptions,
-        fileReplacementPromises,
-      })()
-
-      expect(isResolved).toEqual(false)
-      expect(mockHandleReplacementsInList.mock.calls).toEqual([])
-
-      await p
-
-      expect(isResolved).toEqual(true)
-      expect(mockHandleReplacementsInList.mock.calls).toEqual([[{
-        finalOptions,
-      }]])
-    })
+    expect(mockPromptInteractions.getAnswersForFinalOptions.mock.calls).toEqual([[parsedCommandOpts]])
+    expect(mockPromptInteractions.confirmOptions.mock.calls).toEqual([[expectedFinalOptions]])
+    expect(mockWalkFilesForReplacements.mock.calls).toEqual([[expectedFinalOptions]])
+    expect(mockLifecycle.exitWithError.mock.calls).toEqual([])
   })
 
-  describe("getHandleFileFn", () => {
-    const { getHandleFileFn } = handleParsedCommandOpts._test
-
-    it("calls the expected functions", () => {
-      mockReplacementHelpers.replaceFileIfNecessary.mockReturnValue("replacementValue")
-
-      const next = jest.fn()
-      const onFileReplacementPromise = jest.fn()
-
-      getHandleFileFn({
-        finalOptions: {
-          replacementsCollection: [],
-          searchPattern: "searchPatternValue",
-          searchReplacement: "searchReplacementValue",
-          shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
-          shouldBePreview: "shouldBePreviewValue",
-          shouldUseList: "shouldUseListValue",
-        },
-        onFileReplacementPromise,
-      })("rootValue", { name: "statValue" }, next)
-
-      expect(next.mock.calls).toEqual([[]])
-      expect(onFileReplacementPromise.mock.calls).toEqual([[{
-        fileReplacementPromise: "replacementValue",
-      }]])
-      expect(mockReplacementHelpers.replaceFileIfNecessary.mock.calls).toEqual([[{
-        filePath: "rootValue/statValue",
-        getShouldReplaceFile: expect.any(Function),
-        onFileReplaced: expect.any(Function),
-        searchPattern: "searchPatternValue",
-        searchReplacement: "searchReplacementValue",
-        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
-      }]])
+  it("calls the expected functions when it should not confirm options", async () => {
+    mockPromptInteractions.getAnswersForFinalOptions.mockReturnValue({
+      search: "searchAnswerValue",
     })
+
+    const parsedCommandOpts = {
+      searchPath: "searchPathValue",
+      searchPattern: "searchAnswerValue",
+      searchReplacement: "searchReplacementValue",
+      shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+      shouldBePreview: "shouldBePreviewValue",
+      shouldConfirmOptions: false,
+      shouldUseList: "shouldUseListValue",
+    }
+
+    const expectedFinalOptions = Object.assign({}, parsedCommandOpts)
+
+    await handleParsedCommandOpts(parsedCommandOpts)
+
+    expect(mockPromptInteractions.getAnswersForFinalOptions.mock.calls).toEqual([[parsedCommandOpts]])
+    expect(mockPromptInteractions.confirmOptions.mock.calls).toEqual([])
+    expect(mockWalkFilesForReplacements.mock.calls).toEqual([[expectedFinalOptions]])
+    expect(mockLifecycle.exitWithError.mock.calls).toEqual([])
+  })
+
+  it("uses the answers values when necessary", async () => {
+    mockPromptInteractions.getAnswersForFinalOptions.mockReturnValue({
+      path: "pathAnswerValue",
+      replace: "replaceAnswerValue",
+      search: "searchAnswerValue",
+    })
+
+    const parsedCommandOpts = {
+      searchPath: "",
+      searchPattern: "",
+      searchReplacement: "",
+      shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+      shouldBePreview: "shouldBePreviewValue",
+      shouldConfirmOptions: false,
+      shouldUseList: "shouldUseListValue",
+    }
+
+    const expectedFinalOptions = Object.assign({}, parsedCommandOpts, {
+      searchPath: "pathAnswerValue",
+      searchPattern: "searchAnswerValue",
+      searchReplacement: "replaceAnswerValue",
+    })
+
+    await handleParsedCommandOpts(parsedCommandOpts)
+
+    expect(mockPromptInteractions.getAnswersForFinalOptions.mock.calls).toEqual([[parsedCommandOpts]])
+    expect(mockPromptInteractions.confirmOptions.mock.calls).toEqual([])
+    expect(mockWalkFilesForReplacements.mock.calls).toEqual([[expectedFinalOptions]])
+    expect(mockLifecycle.exitWithError.mock.calls).toEqual([])
+  })
+
+  it("calls exitWithError when there is no searchPath", async () => {
+    mockPromptInteractions.getAnswersForFinalOptions.mockReturnValue({
+      path: "",
+    })
+
+    const parsedCommandOpts = {
+      searchPath: "",
+      searchPattern: "searchAnswerValue",
+      searchReplacement: "searchReplacementValue",
+      shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+      shouldBePreview: "shouldBePreviewValue",
+      shouldConfirmOptions: false,
+      shouldUseList: "shouldUseListValue",
+    }
+
+    await handleParsedCommandOpts(parsedCommandOpts)
+
+    expect(mockLifecycle.exitWithError.mock.calls).toEqual([[texts.ERRORS.MISSING_PATH]])
   })
 })

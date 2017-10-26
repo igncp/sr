@@ -37,19 +37,18 @@ describe(_getTopDescribeText(__filename), () => {
 
     handleReplacementsInList({
       finalOptions: {
-        replacementsCollection: [],
         searchPattern: "searchPatternValue",
         searchReplacement: "searchReplacementValue",
         shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
       },
+      getListReplacementsCollection: () => [],
     })
   }
 
   it("returns a promise that calls setupTerminalListUI", () => {
     const result = handleReplacementsInList({
-      finalOptions: {
-        replacementsCollection: [],
-      },
+      finalOptions: {},
+      getListReplacementsCollection: () => [],
     })
 
     expect(result).toBeInstanceOf(Promise)

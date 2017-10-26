@@ -1,7 +1,10 @@
 // @flow
 
 import { replaceWithCb } from "../../replacementHelpers"
-import type { T_FinalOptions } from "../../commonTypes"
+import type {
+  T_FinalOptions,
+  T_ReplacementsCollection,
+} from "../../commonTypes"
 import {
   readFile,
   writeFile,
@@ -17,13 +20,16 @@ import type { T_ReplacementEntry } from "./handleReplacementsInList.types"
 
 type T_handleReplacementsInList = ({
   finalOptions: T_FinalOptions,
+  getListReplacementsCollection: () => T_ReplacementsCollection
 }) => Promise<{}>
 
 const handleReplacementsInList: T_handleReplacementsInList = ({
   finalOptions,
+  getListReplacementsCollection,
 }) => {
+  const listReplacementsCollection = getListReplacementsCollection()
   const replacementsEntries: T_ReplacementEntry[] =
-    createReplacementEntriesFromReplacementsCollection(finalOptions.replacementsCollection)
+    createReplacementEntriesFromReplacementsCollection(listReplacementsCollection)
 
   const getPreviewContentOnMove = async ({
     itemIndex,

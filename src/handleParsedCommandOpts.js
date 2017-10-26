@@ -1,81 +1,24 @@
 // @flow
 
-import path from "path"
-import chalk from "chalk"
-
-import walk from "walk"
-
 import texts from "./texts"
 import { exitWithError } from "./utils/lifecycle"
-import handleReplacementsInList from "./listOption/handleReplacementsInList/handleReplacementsInList"
 import type {
   T_FinalOptions,
   T_ParsedCommandOpts,
 } from "./commonTypes"
 
-import { replaceFileIfNecessary } from "./replacementHelpers"
 import {
   getAnswersForFinalOptions,
   confirmOptions,
 } from "./promptInteractions"
+import walkFilesForReplacements from "./walkFilesForReplacements"
 
 type T_handleParsedCommandOpts = (opts: T_ParsedCommandOpts) => Promise<void>
 
-const getHandleFileFn = ({
-  finalOptions,
-  onFileReplacementPromise,
-}) => (root, stat, next) => {
-  const filePath = `${root}/${stat.name}`
-
-  const getShouldReplaceFile = ({
-    replacementsCount,
-  }) => {
-    if (finalOptions.shouldUseList) {
-      finalOptions.replacementsCollection.push({
-        filePath,
-        replacementsCount,
-      })
-
-      return false
-    }
-
-    if (finalOptions.shouldBePreview) {
-      console.log(chalk.green(`${texts.FILE_UPDATED_PREVIEW} (x${replacementsCount}) ${filePath}`))
-
-      return false
-    }
-
-    return true
-  }
-
-  const onFileReplaced = ({
-    replacementsCount,
-  }) => {
-    console.log(chalk.green(`${texts.FILE_UPDATED} (x${replacementsCount}) ${filePath}`))
-  }
-
-  const fileReplacementPromise = replaceFileIfNecessary({
-    filePath,
-    getShouldReplaceFile,
-    onFileReplaced,
-    searchPattern: finalOptions.searchPattern,
-    searchReplacement: finalOptions.searchReplacement,
-    shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
-  })
-
-  onFileReplacementPromise({
-    fileReplacementPromise,
-  })
-
-  next()
-}
-
 const buildFinalOptions = (parsedCommandOpts, answers): T_FinalOptions => {
   const searchPath = (parsedCommandOpts.searchPath || answers.path || "").replace(/\/$/, "")
-  const replacementsCollection = []
 
   return {
-    replacementsCollection,
     searchPath,
     searchPattern: parsedCommandOpts.searchPattern || answers.search,
     searchReplacement: parsedCommandOpts.searchReplacement || answers.replace,
@@ -92,19 +35,6 @@ const validateFinalOptions = (finalOptions) => {
   }
 }
 
-const getHandleEndFn = ({
-  fileReplacementPromises,
-  finalOptions,
-}) => async () => {
-  await Promise.all(fileReplacementPromises)
-
-  if (finalOptions.shouldUseList) {
-    await handleReplacementsInList({
-      finalOptions,
-    })
-  }
-}
-
 const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandOpts) => {
   const answers = await getAnswersForFinalOptions(parsedCommandOpts)
   const finalOptions = buildFinalOptions(parsedCommandOpts, answers)
@@ -115,34 +45,7 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
     await confirmOptions(finalOptions)
   }
 
-  const resolvedSearchPath = path.resolve(finalOptions.searchPath)
-
-  const walker = walk.walk(resolvedSearchPath, { followLinks: false })
-
-  const fileReplacementPromises = []
-
-  const handleFile = getHandleFileFn({
-    finalOptions,
-    onFileReplacementPromise: ({
-      fileReplacementPromise,
-    }) => { fileReplacementPromises.push(fileReplacementPromise) },
-  })
-
-  const handleEnd = getHandleEndFn({
-    finalOptions,
-    fileReplacementPromises,
-  })
-
-  walker.on("file", handleFile)
-  walker.on("end", handleEnd)
+  await walkFilesForReplacements(finalOptions)
 }
 
 export default handleParsedCommandOpts
-
-// istanbul ignore else
-if (global.__TEST__) {
-  handleParsedCommandOpts._test = {
-    getHandleEndFn,
-    getHandleFileFn,
-  }
-}

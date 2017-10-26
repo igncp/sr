@@ -15,7 +15,4 @@ export type T_ReplacementsCollection = Array<{|
   filePath: string,
 |}>
 
-export type T_FinalOptions = ExactSpreadWorkaround<{|
-  ...T_ParsedCommandOpts,
-  replacementsCollection: T_ReplacementsCollection,
-|}>
+export type T_FinalOptions = T_ParsedCommandOpts
