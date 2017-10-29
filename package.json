@@ -7,11 +7,11 @@
     "sr": "./lib/cli.js"
   },
   "scripts": {
-    "build": "./node_modules/.bin/babel -d lib src",
-    "lint": "./node_modules/.bin/eslint . && ./node_modules/.bin/flow src",
+    "build": "babel -d lib src --ignore=**/__tests__/**",
+    "lint": "eslint . && ./node_modules/.bin/flow src",
     "prepublish": "yarn run test && yarn run build",
     "prepush": "sh helpers/gitHooks/prepush.sh",
-    "test": "./node_modules/.bin/jest",
+    "test": "jest",
     "test:coverage": "yarn run test -- --coverage",
     "test:travis": "yarn run test:coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "watch": "yarn run build -- --watch"

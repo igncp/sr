@@ -25,3 +25,7 @@ None
 - Add bigger docs
 - Add dependencies (e.g. node version) in Readme
 - Setup commit msg validator
+
+### Refactors
+
+- Change replaceWithCb to pass the index

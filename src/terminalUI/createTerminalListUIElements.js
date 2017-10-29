@@ -2,7 +2,7 @@
 
 import blessed from "blessed"
 
-import { colors } from "./constants"
+import { colors } from "./terminalUIConstants"
 
 type T_createPreviewBox = ({
   screen: any,

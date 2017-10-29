@@ -4,7 +4,7 @@ import {
   createScreen,
   createListWithBox,
   createPreviewBox,
-} from "../createTerminalListUIElements"
+} from "./createTerminalListUIElements"
 
 import { createListKeysHandlers } from "./createListKeysHandlers"
 
@@ -86,7 +86,7 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
       return false
     }
 
-    list.setItems(getRowsValues())
+    list.setItems(rowsValues)
 
     return true
   }

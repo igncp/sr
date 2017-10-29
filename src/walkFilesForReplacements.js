@@ -1,14 +1,11 @@
 // @flow
 
-import path from "path"
 import chalk from "chalk"
-
-import walk from "walk"
 
 import texts from "./texts"
 import handleReplacementsInList from "./listOption/handleReplacementsInList/handleReplacementsInList"
 import type { T_FinalOptions } from "./commonTypes"
-
+import walkFiles from "./utils/walkFiles"
 import { replaceFileIfNecessary } from "./replacementHelpers"
 
 const getHandleFileFn = ({
@@ -69,22 +66,22 @@ const getHandleEndFn = ({
   await Promise.all(fileReplacementPromises)
 
   if (finalOptions.shouldUseList) {
-    await handleReplacementsInList({
+    const result = await handleReplacementsInList({
       getListReplacementsCollection,
       searchPattern: finalOptions.searchPattern,
       searchReplacement: finalOptions.searchReplacement,
       shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
     })
+
+    if (result.wasEmpty) {
+      console.log("no replacements")
+    }
   }
 }
 
 type T_walkFilesForReplacements = (T_FinalOptions) => Promise<void>
 
 const walkFilesForReplacements: T_walkFilesForReplacements = async (finalOptions) => {
-  const resolvedSearchPath = path.resolve(finalOptions.searchPath)
-
-  const walker = walk.walk(resolvedSearchPath, { followLinks: false })
-
   const fileReplacementPromises = []
   const listReplacementsCollection = []
 
@@ -112,8 +109,11 @@ const walkFilesForReplacements: T_walkFilesForReplacements = async (finalOptions
     getListReplacementsCollection,
   })
 
-  walker.on("file", handleFile)
-  walker.on("end", handleEnd)
+  walkFiles({
+    walkPath: finalOptions.searchPath,
+    handleFile,
+    handleEnd,
+  })
 }
 
 export default walkFilesForReplacements

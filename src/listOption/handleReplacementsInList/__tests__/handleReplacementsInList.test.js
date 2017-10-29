@@ -12,7 +12,7 @@ const mockManageReplacementsEntries = {
 }
 
 jest.mock("../../../utils/io", () => mockIO)
-jest.mock("../../setupTerminalListUI/setupTerminalListUI", () => mockSetupTerminalListUI)
+jest.mock("../../../terminalUI/setupTerminalListUI", () => mockSetupTerminalListUI)
 jest.mock("../../../replacementHelpers", () => mockReplacementHelpers)
 jest.mock("../manageReplacementsEntries", () => mockManageReplacementsEntries)
 
@@ -43,7 +43,9 @@ describe(_getTopDescribeText(__filename), () => {
     })
   }
 
-  it("returns a promise that calls setupTerminalListUI", () => {
+  it("returns a promise that calls setupTerminalListUI when the entries have at least one item", () => {
+    mockManageReplacementsEntries.createReplacementsEntriesFromReplacementsCollection.mockReturnValue([{}])
+
     const result = handleReplacementsInList({
       finalOptions: {},
       getListReplacementsCollection: () => [],
@@ -111,73 +113,6 @@ describe(_getTopDescribeText(__filename), () => {
       const cbResult = cb("originalValue")
 
       expect(cbResult).toEqual("originalValue")
-    })
-  })
-
-  describe("onRowSelected", () => {
-    it("calls the expected functions", async () => {
-      setupTest({})
-
-      const removeItem = jest.fn()
-      const { onRowSelected } = mockSetupTerminalListUI.mock.calls[0][0]
-
-      await onRowSelected({
-        itemIndex: 0,
-        removeItem,
-      })
-
-      expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
-      expect(mockIO.writeFile.mock.calls).toEqual([["filePathValue", "replaceWithCbResult"]])
-      expect(removeItem.mock.calls).toEqual([[]])
-      expect(mockManageReplacementsEntries.resetReplacementIndex.mock.calls).toEqual([[{
-        replacementsEntries: [],
-      }]])
-      expect(mockReplacementHelpers.replaceWithCb.mock.calls).toEqual([[{
-        cb: expect.any(Function),
-        fileContent: "readFileContent",
-        searchPattern: "searchPatternValue",
-        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
-      }]])
-    })
-
-    it("passes the expected function to replaceWithCb when localReplacementIndex is different", async () => {
-      setupTest({
-        replacementIndex: 1,
-      })
-
-      const removeItem = jest.fn()
-      const { onRowSelected } = mockSetupTerminalListUI.mock.calls[0][0]
-
-      await onRowSelected({
-        itemIndex: 0,
-        removeItem,
-      })
-
-      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
-
-      const result = cb("textValue")
-
-      expect(result).toEqual("textValue")
-    })
-
-    it("passes the expected function to replaceWithCb when localReplacementIndex is same", async () => {
-      setupTest({
-        replacementIndex: 0,
-      })
-
-      const removeItem = jest.fn()
-      const { onRowSelected } = mockSetupTerminalListUI.mock.calls[0][0]
-
-      await onRowSelected({
-        itemIndex: 0,
-        removeItem,
-      })
-
-      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
-
-      const result = cb("textValue")
-
-      expect(result).toEqual("searchReplacementValue")
     })
   })
 

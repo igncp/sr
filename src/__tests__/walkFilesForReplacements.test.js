@@ -32,6 +32,8 @@ describe(_getTopDescribeText(__filename), () => {
     const { getHandleEndFn } = walkFilesForReplacements._test
 
     it("calls the expected functions when shouldUseList", async () => {
+      mockHandleReplacementsInList.mockReturnValue({})
+
       const finalOptions = {
         shouldUseList: true,
         searchPattern: "searchPatternValue",
@@ -66,6 +68,8 @@ describe(_getTopDescribeText(__filename), () => {
     })
 
     it("waits for the promises to finish", async () => {
+      mockHandleReplacementsInList.mockReturnValue({})
+
       let isResolved = false
       const p1 = new Promise(r => setTimeout(r, 5)).then(() => {isResolved = true})
       const p2 = new Promise(r => setTimeout(r, 1))

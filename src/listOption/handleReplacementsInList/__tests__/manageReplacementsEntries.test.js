@@ -1,39 +1,6 @@
-import {
-  resetReplacementIndex,
-  createReplacementsEntriesFromReplacementsCollection,
-} from "../manageReplacementsEntries"
+import { createReplacementsEntriesFromReplacementsCollection } from "../manageReplacementsEntries"
 
 describe(_getTopDescribeText(__filename), () => {
-  describe("resetReplacementIndex", () => {
-    it("updates the replacement index", () => {
-      const replacementsEntries = [{
-        filePath: "filePathValueA",
-        replacementIndex: 1,
-      }, {
-        filePath: "filePathValueA",
-        replacementIndex: 3,
-      }, {
-        filePath: "filePathValueB",
-        replacementIndex: 2,
-      }]
-
-      resetReplacementIndex({
-        replacementsEntries,
-      })
-
-      expect(replacementsEntries).toEqual([{
-        filePath: "filePathValueA",
-        replacementIndex: 0,
-      }, {
-        filePath: "filePathValueA",
-        replacementIndex: 1,
-      }, {
-        filePath: "filePathValueB",
-        replacementIndex: 0,
-      }])
-    })
-  })
-
   describe("createReplacementsEntriesFromReplacementsCollection", () => {
     it("returns the expected entries", () => {
       const replacementsEntries = createReplacementsEntriesFromReplacementsCollection([{

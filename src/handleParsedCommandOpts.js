@@ -12,6 +12,7 @@ import {
   confirmOptions,
 } from "./promptInteractions"
 import walkFilesForReplacements from "./walkFilesForReplacements"
+import walkFilesForDisplayingExisting from "./handleDisplayExistingOccurrencesOption/walkFilesForDisplayExisting"
 
 type T_handleParsedCommandOpts = (opts: T_ParsedCommandOpts) => Promise<void>
 
@@ -25,6 +26,7 @@ const buildFinalOptions = (parsedCommandOpts, answers): T_FinalOptions => {
     shouldBeCaseSensitive: parsedCommandOpts.shouldBeCaseSensitive,
     shouldBePreview: parsedCommandOpts.shouldBePreview,
     shouldConfirmOptions: parsedCommandOpts.shouldConfirmOptions,
+    shouldDisplayExisting: parsedCommandOpts.shouldDisplayExisting,
     shouldUseList: parsedCommandOpts.shouldUseList,
   }
 }
@@ -43,6 +45,13 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
 
   if (finalOptions.shouldConfirmOptions) {
     await confirmOptions(finalOptions)
+  }
+
+  if (finalOptions.shouldDisplayExisting) {
+    await walkFilesForDisplayingExisting({
+      searchPath: finalOptions.searchPath,
+      searchReplacement: finalOptions.searchReplacement,
+    })
   }
 
   await walkFilesForReplacements(finalOptions)

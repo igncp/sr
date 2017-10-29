@@ -7,7 +7,7 @@ import {
   writeFile,
 } from "../../utils/io"
 
-import setupTerminalListUI from "../setupTerminalListUI/setupTerminalListUI"
+import setupTerminalListUI from "../../terminalUI/setupTerminalListUI"
 
 import {
   createReplacementsEntriesFromReplacementsCollection,
@@ -101,6 +101,14 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
   }
 
   return new Promise((resolve) => {
+    if (replacementsEntries.length === 0) {
+      resolve({
+        wasEmpty: true,
+      })
+
+      return
+    }
+
     setupTerminalListUI({
       getPreviewContentOnMove,
       onRowSelected,

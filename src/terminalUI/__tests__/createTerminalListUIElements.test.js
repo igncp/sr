@@ -1,4 +1,4 @@
-import { colors } from "../constants"
+import { colors } from "../terminalUIConstants"
 
 const mockBlessed = {
   screen: jest.fn(),

@@ -7,6 +7,7 @@ export type T_ParsedCommandOpts = ExactSpreadWorkaround<{|
   shouldBeCaseSensitive: boolean,
   shouldBePreview: boolean,
   shouldConfirmOptions: boolean,
+  shouldDisplayExisting: boolean,
   shouldUseList: boolean,
 |}>
 
