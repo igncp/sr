@@ -2,4 +2,4 @@
 /ignored
 /lib
 /coverage
-yarn-error.log
+*.log
