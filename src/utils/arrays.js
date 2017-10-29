@@ -1,8 +1,8 @@
 // @flow
 
-type T_removeItemsFromArrayWhere = <T: *>(T[], (T) => boolean) => void
+type T_removeItemsFromArrayWhere<T>= (T[], (T) => boolean) => void
 
-export const removeItemsFromArrayWhere: T_removeItemsFromArrayWhere = (arr, predicate) => {
+export const removeItemsFromArrayWhere: T_removeItemsFromArrayWhere<*> = (arr, predicate) => {
   for (let i = arr.length - 1; i >= 0; i--) {
     const item = arr[i]
     const shouldRemoveItem = predicate(item)
@@ -13,9 +13,9 @@ export const removeItemsFromArrayWhere: T_removeItemsFromArrayWhere = (arr, pred
   }
 }
 
-type T_addItemsInArrayAtIndexPos = <T: *>(T[], T[], number) => void
+type T_addItemsInArrayAtIndexPos<T> = (T[], T[], number) => void
 
-export const addItemsInArrayAtIndexPos: T_addItemsInArrayAtIndexPos = (items, arr, indexPos) => {
+export const addItemsInArrayAtIndexPos: T_addItemsInArrayAtIndexPos<*> = (items, arr, indexPos) => {
   items.forEach((item, itemIndex) => {
     arr.splice(indexPos + itemIndex, 0, (item: any))
   })
