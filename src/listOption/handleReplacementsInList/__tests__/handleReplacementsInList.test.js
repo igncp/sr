@@ -6,15 +6,15 @@ const mockIO = {
   readFile: jest.fn(),
 }
 const mockSetupTerminalListUI = jest.fn()
-const mockHandleReplacementsInListHelpers = {
-  createReplacementEntriesFromReplacementsCollection: jest.fn(),
+const mockManageReplacementsEntries = {
+  createReplacementsEntriesFromReplacementsCollection: jest.fn(),
   resetReplacementIndex: jest.fn(),
 }
 
 jest.mock("../../../utils/io", () => mockIO)
 jest.mock("../../setupTerminalListUI/setupTerminalListUI", () => mockSetupTerminalListUI)
 jest.mock("../../../replacementHelpers", () => mockReplacementHelpers)
-jest.mock("../handleReplacementsInListHelpers", () => mockHandleReplacementsInListHelpers)
+jest.mock("../manageReplacementsEntries", () => mockManageReplacementsEntries)
 
 beforeEach(() => {
   mockIO.readFile.mockReturnValue("readFileContent")
@@ -26,7 +26,7 @@ describe(_getTopDescribeText(__filename), () => {
   const setupTest = ({
     replacementIndex = "replacementIndexValue",
   }) => {
-    mockHandleReplacementsInListHelpers.createReplacementEntriesFromReplacementsCollection
+    mockManageReplacementsEntries.createReplacementsEntriesFromReplacementsCollection
       .mockReturnValue([{
         filePath: "filePathValue",
         id: "idValue",
@@ -129,7 +129,7 @@ describe(_getTopDescribeText(__filename), () => {
       expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
       expect(mockIO.writeFile.mock.calls).toEqual([["filePathValue", "replaceWithCbResult"]])
       expect(removeItem.mock.calls).toEqual([[]])
-      expect(mockHandleReplacementsInListHelpers.resetReplacementIndex.mock.calls).toEqual([[{
+      expect(mockManageReplacementsEntries.resetReplacementIndex.mock.calls).toEqual([[{
         replacementsEntries: [],
       }]])
       expect(mockReplacementHelpers.replaceWithCb.mock.calls).toEqual([[{

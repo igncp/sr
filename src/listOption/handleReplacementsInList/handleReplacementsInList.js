@@ -1,10 +1,7 @@
 // @flow
 
 import { replaceWithCb } from "../../replacementHelpers"
-import type {
-  T_FinalOptions,
-  T_ReplacementsCollection,
-} from "../../commonTypes"
+import type { T_ReplacementsCollection } from "../../commonTypes"
 import {
   readFile,
   writeFile,
@@ -13,9 +10,9 @@ import {
 import setupTerminalListUI from "../setupTerminalListUI/setupTerminalListUI"
 
 import {
-  createReplacementEntriesFromReplacementsCollection,
-  resetReplacementIndex,
-} from "./handleReplacementsInListHelpers"
+  createReplacementsEntriesFromReplacementsCollection,
+  updateReplacementsEntriesForFilePath,
+} from "./manageReplacementsEntries"
 import type { T_ReplacementEntry } from "./handleReplacementsInList.types"
 
 type T_handleReplacementsInList = ({
@@ -33,7 +30,7 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
 }) => {
   const listReplacementsCollection = getListReplacementsCollection()
   const replacementsEntries: T_ReplacementEntry[] =
-    createReplacementEntriesFromReplacementsCollection(listReplacementsCollection)
+    createReplacementsEntriesFromReplacementsCollection(listReplacementsCollection)
 
   const getPreviewContentOnMove = async ({
     itemIndex,
@@ -67,7 +64,6 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
 
   const onRowSelected = async ({
     itemIndex,
-    removeItem,
   }) => {
     const {
       filePath,
@@ -95,12 +91,12 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
 
     await writeFile(filePath, newFileContent)
 
-    replacementsEntries.splice(itemIndex, 1)
-
-    await removeItem()
-
-    resetReplacementIndex({
+    await updateReplacementsEntriesForFilePath({
+      filePath,
       replacementsEntries,
+      searchPattern,
+      searchReplacement,
+      shouldBeCaseSensitive,
     })
   }
 

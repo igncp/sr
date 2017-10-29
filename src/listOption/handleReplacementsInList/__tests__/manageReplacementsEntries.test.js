@@ -1,7 +1,7 @@
 import {
   resetReplacementIndex,
-  createReplacementEntriesFromReplacementsCollection,
-} from "../handleReplacementsInListHelpers"
+  createReplacementsEntriesFromReplacementsCollection,
+} from "../manageReplacementsEntries"
 
 describe(_getTopDescribeText(__filename), () => {
   describe("resetReplacementIndex", () => {
@@ -34,9 +34,9 @@ describe(_getTopDescribeText(__filename), () => {
     })
   })
 
-  describe("createReplacementEntriesFromReplacementsCollection", () => {
+  describe("createReplacementsEntriesFromReplacementsCollection", () => {
     it("returns the expected entries", () => {
-      const replacementsEntries = createReplacementEntriesFromReplacementsCollection([{
+      const replacementsEntries = createReplacementsEntriesFromReplacementsCollection([{
         replacementsCount: 1,
         foo: "bar",
       }, {

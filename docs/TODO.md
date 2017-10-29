@@ -1,14 +1,14 @@
 # TODO
 
-### Fixes
+### Known Fixes
 
-- When an entry in list is selected, recalculate the replacements for the file
+None
 
 ### Functionality
 
 - Improve preview message when displaying list
   - Add keys helpers
-  - display difference
+  - Display difference
   - Better movement
 - Add option to display entries of replacement alreay existing before
 - Add preview to list

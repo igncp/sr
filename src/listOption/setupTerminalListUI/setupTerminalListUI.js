@@ -12,10 +12,9 @@ type T_getPreviewContentOnMove = ({
   itemIndex: number,
 }) => Promise<string>
 
-type T_onRowSelected = ({
+type T_onRowSelected = ({|
   itemIndex: number,
-  removeItem: () => Promise<void>,
-}) => Promise<void>
+|}) => Promise<void>
 
 type T_onSuccess = (any) => void
 
@@ -39,7 +38,7 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
   onSuccess,
   getListRows,
 }) => {
-  const rowsValues = getListRows().map(r => r.value)
+  const getRowsValues = () => getListRows().map(r => r.value)
   const screen = createScreen()
 
   const previewBox = createPreviewBox({
@@ -51,7 +50,7 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
     list,
   } = createListWithBox({
     screen,
-    items: rowsValues.slice(0),
+    items: getRowsValues(),
   })
 
   screen.append(listBox)
@@ -67,31 +66,29 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
     previewBox.setContent(previewContent)
   }
 
+  const finish = () => {
+    screen.destroy()
+    onSuccess({})
+  }
+
   const onEnter = async ({
     itemIndex,
   }) => {
-    let shouldMove = false
-
-    const removeItem = async () => {
-      list.removeItem(itemIndex)
-
-      const rows = getListRows()
-
-      if (rows.length === 0) {
-        screen.destroy()
-
-        return
-      }
-
-      shouldMove = true
-    }
-
     await onRowSelected({
       itemIndex,
-      removeItem,
     })
 
-    return shouldMove
+    const rowsValues = getRowsValues()
+
+    if (rowsValues.length === 0) {
+      finish()
+
+      return false
+    }
+
+    list.setItems(getRowsValues())
+
+    return true
   }
 
   const {
@@ -113,14 +110,7 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
 
   previewBox.key(["left"], () => list.focus())
 
-  const getFinishScreenFn = cb => () => {
-    screen.destroy()
-    cb()
-  }
-
-  screen.key(["C-c", "q"], getFinishScreenFn(() => {
-    onSuccess({})
-  }))
+  screen.key(["C-c", "q"], finish)
 
   await onMove({
     itemIndex: 0,

@@ -58,11 +58,11 @@ type T_FileReplacementData = {|
 type T_replaceFileIfNecessary = ({
   filePath: string,
   getShouldReplaceFile: (T_FileReplacementData) => boolean,
-  onFileReplaced: (T_FileReplacementData) => void,
+  onFileReplaced?: (T_FileReplacementData) => void,
   searchPattern: string,
   searchReplacement: string,
   shouldBeCaseSensitive: boolean,
-}) => Promise<void>
+}) => Promise<T_FileReplacementData>
 
 export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
   filePath,
@@ -83,21 +83,24 @@ export const replaceFileIfNecessary: T_replaceFileIfNecessary = async ({
     shouldBeCaseSensitive,
   })
 
+  const fileReplacementData = {
+    filePath,
+    replacementsCount,
+  }
+
   if (fileContent !== newFileContent) {
-    const fileReplacementData = {
-      filePath,
-      replacementsCount,
-    }
     const shouldReplace = getShouldReplaceFile(fileReplacementData)
 
-    if (!shouldReplace) {
-      return
+    if (shouldReplace) {
+      await writeFile(filePath, newFileContent)
+
+      if (onFileReplaced) {
+        onFileReplaced(fileReplacementData)
+      }
     }
-
-    await writeFile(filePath, newFileContent)
-
-    onFileReplaced(fileReplacementData)
   }
+
+  return fileReplacementData
 }
 
 // istanbul ignore else
