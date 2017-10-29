@@ -70,8 +70,10 @@ const getHandleEndFn = ({
 
   if (finalOptions.shouldUseList) {
     await handleReplacementsInList({
-      finalOptions,
       getListReplacementsCollection,
+      searchPattern: finalOptions.searchPattern,
+      searchReplacement: finalOptions.searchReplacement,
+      shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
     })
   }
 }

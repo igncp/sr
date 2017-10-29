@@ -36,11 +36,9 @@ describe(_getTopDescribeText(__filename), () => {
     mockReplacementHelpers.replaceWithCb.mockReturnValue("replaceWithCbResult")
 
     handleReplacementsInList({
-      finalOptions: {
-        searchPattern: "searchPatternValue",
-        searchReplacement: "searchReplacementValue",
-        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
-      },
+      searchPattern: "searchPatternValue",
+      searchReplacement: "searchReplacementValue",
+      shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
       getListReplacementsCollection: () => [],
     })
   }

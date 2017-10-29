@@ -19,13 +19,17 @@ import {
 import type { T_ReplacementEntry } from "./handleReplacementsInList.types"
 
 type T_handleReplacementsInList = ({
-  finalOptions: T_FinalOptions,
+  searchPattern: string,
+  searchReplacement: string,
+  shouldBeCaseSensitive: boolean,
   getListReplacementsCollection: () => T_ReplacementsCollection,
 }) => Promise<{}>
 
 const handleReplacementsInList: T_handleReplacementsInList = ({
-  finalOptions,
   getListReplacementsCollection,
+  searchPattern,
+  searchReplacement,
+  shouldBeCaseSensitive,
 }) => {
   const listReplacementsCollection = getListReplacementsCollection()
   const replacementsEntries: T_ReplacementEntry[] =
@@ -44,14 +48,14 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
     const fileContent = await readFile(filePath)
 
     const newFileContent = replaceWithCb({
-      searchPattern: finalOptions.searchPattern,
-      shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
+      searchPattern,
+      shouldBeCaseSensitive,
       fileContent,
       cb: (original) => {
         localReplacementIndex++
 
         if (localReplacementIndex === replacementIndex) {
-          return `{black-fg}{white-bg}${finalOptions.searchReplacement}{/white-bg}{/black-fg}`
+          return `{black-fg}{white-bg}${searchReplacement}{/white-bg}{/black-fg}`
         }
 
         return original
@@ -75,14 +79,14 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
     const fileContent = await readFile(filePath)
 
     const newFileContent = replaceWithCb({
-      shouldBeCaseSensitive: finalOptions.shouldBeCaseSensitive,
-      searchPattern: finalOptions.searchPattern,
+      shouldBeCaseSensitive,
+      searchPattern,
       fileContent,
       cb: (original) => {
         localReplacementIndex++
 
         if (localReplacementIndex === replacementIndex) {
-          return finalOptions.searchReplacement
+          return searchReplacement
         }
 
         return original

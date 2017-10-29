@@ -34,6 +34,9 @@ describe(_getTopDescribeText(__filename), () => {
     it("calls the expected functions when shouldUseList", async () => {
       const finalOptions = {
         shouldUseList: true,
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+        searchReplacement: "searchReplacementValue",
       }
 
       await getHandleEndFn({
@@ -42,7 +45,9 @@ describe(_getTopDescribeText(__filename), () => {
       })()
 
       expect(mockHandleReplacementsInList.mock.calls).toEqual([[{
-        finalOptions,
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+        searchReplacement: "searchReplacementValue",
       }]])
     })
 
@@ -66,6 +71,9 @@ describe(_getTopDescribeText(__filename), () => {
       const p2 = new Promise(r => setTimeout(r, 1))
       const finalOptions = {
         shouldUseList: true,
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+        searchReplacement: "searchReplacementValue",
       }
       const fileReplacementPromises = [p1, p2]
 
@@ -81,7 +89,9 @@ describe(_getTopDescribeText(__filename), () => {
 
       expect(isResolved).toEqual(true)
       expect(mockHandleReplacementsInList.mock.calls).toEqual([[{
-        finalOptions,
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+        searchReplacement: "searchReplacementValue",
       }]])
     })
   })
