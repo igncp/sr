@@ -2,11 +2,13 @@
 
 ### Known Fixes
 
-None
+- Promise exception when not replacing all in the list
 
 ### Functionality
 
+- Focus scroll in match / replacement
 - Improve preview message when displaying list
+  - Display explanation of the list
   - Add keys helpers
   - Display difference
   - Better movement
