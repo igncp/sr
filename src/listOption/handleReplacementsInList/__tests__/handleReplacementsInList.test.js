@@ -8,7 +8,7 @@ const mockIO = {
 const mockSetupTerminalListUI = jest.fn()
 const mockManageReplacementsEntries = {
   createReplacementsEntriesFromReplacementsCollection: jest.fn(),
-  resetReplacementIndex: jest.fn(),
+  updateReplacementsEntriesForFilePath: jest.fn(),
 }
 
 jest.mock("../../../utils/io", () => mockIO)
@@ -60,6 +60,94 @@ describe(_getTopDescribeText(__filename), () => {
     }]])
   })
 
+  it("returns a promise that resolves when the entries have 0 items", async () => {
+    mockManageReplacementsEntries.createReplacementsEntriesFromReplacementsCollection.mockReturnValue([])
+
+    const result = await handleReplacementsInList({
+      finalOptions: {},
+      getListReplacementsCollection: () => [],
+    })
+
+    expect(result).toEqual({
+      wasEmpty: true,
+    })
+  })
+
+  describe("onRowSelected", () => {
+    it("calls the expected functions", async () => {
+      setupTest({})
+
+      const { onRowSelected } = mockSetupTerminalListUI.mock.calls[0][0]
+
+      await onRowSelected({
+        itemIndex: 0,
+      })
+
+      expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
+      expect(mockIO.writeFile.mock.calls).toEqual([["filePathValue", "replaceWithCbResult"]])
+      expect(mockReplacementHelpers.replaceWithCb.mock.calls).toEqual([[{
+        cb: expect.any(Function),
+        fileContent: "readFileContent",
+        searchPattern: "searchPatternValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+      }]])
+      expect(mockManageReplacementsEntries.updateReplacementsEntriesForFilePath.mock.calls).toEqual([[{
+        filePath: "filePathValue",
+        replacementsEntries: [{
+          filePath: "filePathValue",
+          id: "idValue",
+          replacementIndex: "replacementIndexValue",
+          replacementsCount: "replacementsCountValue",
+        }],
+        searchPattern: "searchPatternValue",
+        searchReplacement: "searchReplacementValue",
+        shouldBeCaseSensitive: "shouldBeCaseSensitiveValue",
+      }]])
+    })
+
+    it("passes the expected fn to replaceWithCb when replacementIndex is different", async () => {
+      setupTest({
+        replacementIndex: 0,
+      })
+
+      const { onRowSelected } = mockSetupTerminalListUI.mock.calls[0][0]
+
+      await onRowSelected({
+        itemIndex: 0,
+      })
+
+      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
+
+      const result = cb({
+        originalStr: "originalStrValue",
+        replacementIndex: 1,
+      })
+
+      expect(result).toEqual("originalStrValue")
+    })
+
+    it("passes the expected fn to replaceWithCb when replacementIndex is equal", async () => {
+      setupTest({
+        replacementIndex: 1,
+      })
+
+      const { onRowSelected } = mockSetupTerminalListUI.mock.calls[0][0]
+
+      await onRowSelected({
+        itemIndex: 0,
+      })
+
+      const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
+
+      const result = cb({
+        originalStr: "originalStrValue",
+        replacementIndex: 1,
+      })
+
+      expect(result).toEqual("searchReplacementValue")
+    })
+  })
+
   describe("getPreviewContentOnMove", () => {
     it("calls the expected functions", async () => {
       setupTest({})
@@ -92,14 +180,17 @@ describe(_getTopDescribeText(__filename), () => {
 
       const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
 
-      const cbResult = cb("originalValue")
+      const cbResult = cb({
+        originalStr: "originalStrValue",
+        replacementIndex: 0,
+      })
 
       expect(cbResult).toEqual("{black-fg}{white-bg}searchReplacementValue{/white-bg}{/black-fg}")
     })
 
     it("passes the expected cb to replaceWithCb when different replacement index", async () => {
       setupTest({
-        replacementIndex: 1,
+        replacementIndex: 0,
       })
 
       const { getPreviewContentOnMove } = mockSetupTerminalListUI.mock.calls[0][0]
@@ -110,9 +201,12 @@ describe(_getTopDescribeText(__filename), () => {
 
       const { cb } = mockReplacementHelpers.replaceWithCb.mock.calls[0][0]
 
-      const cbResult = cb("originalValue")
+      const cbResult = cb({
+        originalStr: "originalStrValue",
+        replacementIndex: 1,
+      })
 
-      expect(cbResult).toEqual("originalValue")
+      expect(cbResult).toEqual("originalStrValue")
     })
   })
 

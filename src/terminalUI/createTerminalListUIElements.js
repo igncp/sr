@@ -15,6 +15,12 @@ type T_createListWithBox = ({
 
 type T_createScreen = () => any
 
+const getPreviewBoxPageScrollRows = (previewBox) => {
+  const scrollRows = Math.floor((previewBox.height - 2) / 2)
+
+  return scrollRows
+}
+
 export const createPreviewBox: T_createPreviewBox = ({
   screen,
 }) => {
@@ -50,10 +56,28 @@ export const createPreviewBox: T_createPreviewBox = ({
     previewBox.scroll(-1)
     screen.render()
   })
+
+  previewBox.key(["pageup"], () => {
+    const scrollRows = getPreviewBoxPageScrollRows(previewBox)
+
+    previewBox.scroll(-scrollRows)
+
+    screen.render()
+  })
+
   previewBox.key(["down"], () => {
     previewBox.scroll(1)
     screen.render()
   })
+
+  previewBox.key(["pagedown"], () => {
+    const scrollRows = getPreviewBoxPageScrollRows(previewBox)
+
+    previewBox.scroll(scrollRows)
+
+    screen.render()
+  })
+
   previewBox.key(["home"], () => {
     previewBox.scrollTo(0)
     screen.render()
@@ -137,4 +161,11 @@ export const createScreen: T_createScreen = () => {
   })
 
   return screen
+}
+
+// istanbul ignore else
+if (global.__TEST__) {
+  module.exports._test = {
+    getPreviewBoxPageScrollRows,
+  }
 }

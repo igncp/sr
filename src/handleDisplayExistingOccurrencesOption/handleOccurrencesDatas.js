@@ -35,21 +35,22 @@ const handleOccurrencesDatas: T_handleOccurrencesData = ({
 
     const fileContent = await readFile(entry.filePath)
 
-    let localReplacementIndex = -1
+    const replaceWithCbFn = ({
+      originalStr,
+      replacementIndex,
+    }) => {
+      if (replacementIndex === entry.occurrenceIndex) {
+        return `{black-fg}{white-bg}${originalStr}{/white-bg}{/black-fg}`
+      }
+
+      return originalStr
+    }
 
     return replaceWithCb({
       fileContent,
       searchPattern: findString,
       shouldBeCaseSensitive: true,
-      cb: (original) => {
-        localReplacementIndex++
-
-        if (localReplacementIndex === entry.occurrenceIndex) {
-          return `{black-fg}{white-bg}${original}{/white-bg}{/black-fg}`
-        }
-
-        return original
-      },
+      cb: replaceWithCbFn,
     })
   }
 

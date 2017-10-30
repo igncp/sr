@@ -5,11 +5,17 @@ import {
   writeFile,
 } from "./utils/io"
 
+type T_ReplaceWithCbFn = ({|
+  originalStr: string,
+  replaceArgs: any[],
+  replacementIndex: number,
+|}) => string
+
 type T_replaceWithCb = ({
   shouldBeCaseSensitive: boolean,
   searchPattern: string,
   fileContent: string,
-  cb: Function,
+  cb: T_ReplaceWithCbFn,
 }) => string
 
 export const replaceWithCb: T_replaceWithCb = ({
@@ -22,7 +28,19 @@ export const replaceWithCb: T_replaceWithCb = ({
   const regexpOpts = shouldBeCaseSensitive ? defaultOpts : `i${defaultOpts}`
   const regex = new RegExp(searchPattern, regexpOpts)
 
-  return fileContent.replace(regex, cb)
+  let replacementIndex = -1
+
+  return fileContent.replace(regex, (...replaceArgs) => {
+    replacementIndex++
+
+    const [originalStr] = replaceArgs
+
+    return cb({
+      originalStr,
+      replaceArgs,
+      replacementIndex,
+    })
+  })
 }
 
 const replace = ({

@@ -10,6 +10,7 @@ jest.mock("blessed", () => mockBlessed)
 
 describe(_getTopDescribeText(__filename), () => {
   const {
+    _test,
     createListWithBox,
     createPreviewBox,
     createScreen,
@@ -137,7 +138,9 @@ describe(_getTopDescribeText(__filename), () => {
       }]])
       expect(box.key.mock.calls).toEqual([
         [["up"], expect.any(Function)],
+        [["pageup"], expect.any(Function)],
         [["down"], expect.any(Function)],
+        [["pagedown"], expect.any(Function)],
         [["home"], expect.any(Function)],
         [["end"], expect.any(Function)],
       ])
@@ -153,6 +156,7 @@ describe(_getTopDescribeText(__filename), () => {
           key: jest.fn(),
           scroll: jest.fn(),
           scrollTo: jest.fn(),
+          height: 10,
         }
         screen = {
           render: jest.fn(),
@@ -202,6 +206,34 @@ describe(_getTopDescribeText(__filename), () => {
         expect(box.scrollTo.mock.calls).toEqual([["scrollHeightValue"]])
         expect(screen.render.mock.calls).toEqual([[]])
       })
+
+      it("subscribes the expected pageup key handler", () => {
+        const fn = box.key.mock.calls.find(c => c[0][0] === "pageup") [1]
+
+        fn()
+
+        expect(box.scroll.mock.calls).toEqual([[-4]])
+        expect(screen.render.mock.calls).toEqual([[]])
+      })
+
+      it("subscribes the expected pagedown key handler", () => {
+        const fn = box.key.mock.calls.find(c => c[0][0] === "pagedown") [1]
+
+        fn()
+
+        expect(box.scroll.mock.calls).toEqual([[4]])
+        expect(screen.render.mock.calls).toEqual([[]])
+      })
+    })
+  })
+
+  describe("getPreviewBoxPageScrollRows", () => {
+    const { getPreviewBoxPageScrollRows } = _test
+
+    it("returns the expected results", () => {
+      expect(getPreviewBoxPageScrollRows({ height: 20 })).toEqual(9)
+      expect(getPreviewBoxPageScrollRows({ height: 100 })).toEqual(49)
+      expect(getPreviewBoxPageScrollRows({ height: 2 })).toEqual(0)
     })
   })
 })

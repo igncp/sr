@@ -40,23 +40,24 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
       replacementIndex,
     } = replacementsEntries[itemIndex]
 
-    let localReplacementIndex = -1
-
     const fileContent = await readFile(filePath)
+
+    const replaceWithCbFn = ({
+      originalStr,
+      replacementIndex: localReplacementIndex,
+    }) => {
+      if (localReplacementIndex === replacementIndex) {
+        return `{black-fg}{white-bg}${searchReplacement}{/white-bg}{/black-fg}`
+      }
+
+      return originalStr
+    }
 
     const newFileContent = replaceWithCb({
       searchPattern,
       shouldBeCaseSensitive,
       fileContent,
-      cb: (original) => {
-        localReplacementIndex++
-
-        if (localReplacementIndex === replacementIndex) {
-          return `{black-fg}{white-bg}${searchReplacement}{/white-bg}{/black-fg}`
-        }
-
-        return original
-      },
+      cb: replaceWithCbFn,
     })
 
     return newFileContent
@@ -70,23 +71,24 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
       replacementIndex,
     } = replacementsEntries[itemIndex]
 
-    let localReplacementIndex = -1
-
     const fileContent = await readFile(filePath)
+
+    const replaceWithCbFn = ({
+      originalStr,
+      replacementIndex: localReplacementIndex,
+    }) => {
+      if (localReplacementIndex === replacementIndex) {
+        return searchReplacement
+      }
+
+      return originalStr
+    }
 
     const newFileContent = replaceWithCb({
       shouldBeCaseSensitive,
       searchPattern,
       fileContent,
-      cb: (original) => {
-        localReplacementIndex++
-
-        if (localReplacementIndex === replacementIndex) {
-          return searchReplacement
-        }
-
-        return original
-      },
+      cb: replaceWithCbFn,
     })
 
     await writeFile(filePath, newFileContent)
