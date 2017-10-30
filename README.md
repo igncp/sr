@@ -5,15 +5,17 @@
 Search and replace for the command line
 
 It provides a productive way of replacing strings in files via command line, including the following features:
-- Replace matches one by one, viewing the diff
-- Use regular expressions which accept matched groups in the replacements, using `String.prototype.replace` under the hood
-- Preview already existing matches of the replacement text
+- Replace matches one by one, viewing the diff, and updating the diff each time a change is made to a file
+- Use regular expressions, which accept matched groups in the replacements, using `String.prototype.replace` under the hood
+- Preview already existing matches of the replacement text in case you want to make sure it is a new string
 
-For more info, you can run
+For more info, you can run:
 
 `sr --help`
 
-This package uses Node for everything, and it will be slower than other alternatives using C, Go, Rust, etc. The goal of this package is not performance, but the features listed above. The speed in medium project sizes (less than 100k lines) is acceptable. PRs to improve the performance are always welcome.
+It requires Node v6.10 or higher
+
+This package uses Node for everything, and it will be slower than other alternatives using C, Go, Rust, etc. The goal of this package is not maximize performance, but the features listed above. The speed in medium project sizes (less than 100k lines) is acceptable. PRs to improve the performance are always welcome.
 
 **This package is under active development. The package name is provisional and the API may have breaking changes**
 
