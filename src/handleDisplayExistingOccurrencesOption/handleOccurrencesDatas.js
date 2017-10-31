@@ -40,7 +40,6 @@ const handleOccurrencesDatas: T_handleOccurrencesData = ({
     const replaceWithCbFn = ({
       offset,
       originalStr,
-      replaceArgs,
       replacementIndex,
     }) => {
       if (replacementIndex === entry.occurrenceIndex) {
