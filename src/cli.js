@@ -17,7 +17,7 @@ const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
     shouldBePreview: !!parsedProgram.preview,
     shouldConfirmOptions: !!parsedProgram.confirm,
     shouldDisplayExisting: !!parsedProgram.existing,
-    shouldUseList: !!parsedProgram.list,
+    shouldUseList: !parsedProgram.noList,
   }
 }
 
@@ -28,7 +28,7 @@ const main = () => {
     .option("-i, --case-insensitive", "case insensitive search [default=false]")
     .option("-p, --preview", "preview results without modifying files (not applicable to list) [default=false]")
     .option("-c, --confirm", "confirm selection of options [default=false]")
-    .option("-l, --list", "select replacements using an interactive list (no preview)")
+    .option("-l, --no-list", "disable list to select replacements interactively [default=true]")
     .option("-e, --existing", "show existing matches of the replacement string, in a list")
     .parse(process.argv)
 
