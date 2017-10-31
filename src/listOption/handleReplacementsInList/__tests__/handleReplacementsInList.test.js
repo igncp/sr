@@ -158,7 +158,10 @@ describe(_getTopDescribeText(__filename), () => {
       })
 
       expect(mockIO.readFile.mock.calls).toEqual([["filePathValue"]])
-      expect(result).toEqual("replaceWithCbResult")
+      expect(result).toEqual({
+        content: "replaceWithCbResult",
+        focusPosition: 0,
+      })
       expect(mockReplacementHelpers.replaceWithCb.mock.calls).toEqual([[{
         cb: expect.any(Function),
         fileContent: "readFileContent",

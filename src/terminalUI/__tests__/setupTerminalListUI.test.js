@@ -23,7 +23,9 @@ const createListWithBoxReturn = {
 
 const createPreviewBoxReturn = {
   focus: jest.fn(),
+  height: 10,
   key: jest.fn(),
+  scrollTo: jest.fn(),
   setContent: jest.fn(),
 }
 
@@ -45,13 +47,20 @@ beforeEach(() => {
   })
 })
 
+const getCommonPreviewContentOnMoveFn = () => {
+  return jest.fn(() => ({
+    content: "previewContentValue",
+    focusPosition: 30,
+  }))
+}
+
 describe(_getTopDescribeText(__filename), () => {
   const setupTerminalListUI = require("../setupTerminalListUI").default
 
   it("calls the expected functions", async () => {
     const args = {
       getListRows: jest.fn(() => []),
-      getPreviewContentOnMove: jest.fn(() => "previewContentValue"),
+      getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
     }
 
     await setupTerminalListUI(args)
@@ -71,6 +80,7 @@ describe(_getTopDescribeText(__filename), () => {
     expect(args.getPreviewContentOnMove.mock.calls).toEqual([[{
       itemIndex: 0,
     }]])
+    expect(createPreviewBoxReturn.scrollTo.mock.calls).toEqual([[0]])
 
     expect(createListWithBoxReturn.list.key.mock.calls).toEqual([
       [["down"], "handleMoveDownValue"],
@@ -100,7 +110,7 @@ describe(_getTopDescribeText(__filename), () => {
     beforeEach(async () => {
       const args = {
         getListRows: jest.fn(() => []),
-        getPreviewContentOnMove: jest.fn(() => "previewContentValue"),
+        getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
       }
 
       await setupTerminalListUI(args)
@@ -130,7 +140,7 @@ describe(_getTopDescribeText(__filename), () => {
   it("passes the expected getRowsLength function to createListKeysHandlers", async () => {
     const args = {
       getListRows: jest.fn(() => [{}, {}]),
-      getPreviewContentOnMove: jest.fn(() => "previewContentValue"),
+      getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
     }
 
     await setupTerminalListUI(args)
@@ -148,7 +158,7 @@ describe(_getTopDescribeText(__filename), () => {
     it("returns false and calls expected functions if rowsValues.length is 0", async () => {
       const args = {
         getListRows: jest.fn(() => []),
-        getPreviewContentOnMove: jest.fn(() => "previewContentValue"),
+        getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
         onRowSelected: jest.fn(),
         onSuccess: jest.fn(),
       }
@@ -175,7 +185,7 @@ describe(_getTopDescribeText(__filename), () => {
     it("returns true and calls expected functions if rowsValues.length greater than 0", async () => {
       const args = {
         getListRows: jest.fn(() => [{ value: "valueContent" }]),
-        getPreviewContentOnMove: jest.fn(() => "previewContentValue"),
+        getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
         onRowSelected: jest.fn(),
         onSuccess: jest.fn(),
       }

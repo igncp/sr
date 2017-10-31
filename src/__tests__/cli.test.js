@@ -37,8 +37,8 @@ describe(_getTopDescribeText(__filename), () => {
       ["-i, --case-insensitive", "case insensitive search [default=false]"],
       ["-p, --preview", "preview results without modifying files (not applicable to list) [default=false]"],
       ["-c, --confirm", "confirm selection of options [default=false]"],
-      ["-l, --list", "select replacements using an interactive list (no preview)"],
       ["-e, --existing", "show existing matches of the replacement string, in a list"],
+      ["--disable-list", "disable list to select replacements interactively"],
     ])
     expect(mockCommander.usage.mock.calls).toEqual([["[options] <searchPath searchPattern replacementString>"]])
     expect(mockCommander.parse.mock.calls).toEqual([["processArgvValue"]])
@@ -55,7 +55,7 @@ describe(_getTopDescribeText(__filename), () => {
       shouldBePreview: false,
       shouldConfirmOptions: false,
       shouldDisplayExisting: false,
-      shouldUseList: false,
+      shouldUseList: true,
     }]])
   })
 })
