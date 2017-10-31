@@ -1,5 +1,6 @@
 // @flow
 
+import { getLineNumberOfPositionInString } from "../utils/strings"
 import {
   createScreen,
   createListWithBox,
@@ -10,7 +11,10 @@ import { createListKeysHandlers } from "./createListKeysHandlers"
 
 type T_getPreviewContentOnMove = ({
   itemIndex: number,
-}) => Promise<string>
+}) => Promise<{|
+  content: string,
+  focusPosition?: number,
+|}>
 
 type T_onRowSelected = ({|
   itemIndex: number,
@@ -59,11 +63,22 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
   const onMove = async ({
     itemIndex,
   }) => {
-    const previewContent = await getPreviewContentOnMove({
+    const {
+      content,
+      focusPosition,
+    } = await getPreviewContentOnMove({
       itemIndex,
     })
 
-    previewBox.setContent(previewContent)
+    const lineNumber = getLineNumberOfPositionInString({
+      string: content,
+      position: focusPosition || 0,
+    })
+
+    const scrollPosition = Math.floor(lineNumber - (previewBox.height / 2))
+
+    previewBox.setContent(content)
+    previewBox.scrollTo(scrollPosition < 0 ? 0 : scrollPosition)
   }
 
   const finish = () => {

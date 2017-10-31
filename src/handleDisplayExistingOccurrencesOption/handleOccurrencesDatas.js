@@ -35,23 +35,34 @@ const handleOccurrencesDatas: T_handleOccurrencesData = ({
 
     const fileContent = await readFile(entry.filePath)
 
+    let focusPosition = 0
+
     const replaceWithCbFn = ({
+      offset,
       originalStr,
+      replaceArgs,
       replacementIndex,
     }) => {
       if (replacementIndex === entry.occurrenceIndex) {
+        focusPosition = offset
+
         return `{black-fg}{white-bg}${originalStr}{/white-bg}{/black-fg}`
       }
 
       return originalStr
     }
 
-    return replaceWithCb({
+    const newContent = replaceWithCb({
       fileContent,
       searchPattern: findString,
       shouldBeCaseSensitive: true,
       cb: replaceWithCbFn,
     })
+
+    return {
+      content: newContent,
+      focusPosition,
+    }
   }
 
   const onRowSelected = async ({

@@ -6,6 +6,7 @@ import {
 } from "./utils/io"
 
 type T_ReplaceWithCbFn = ({|
+  offset: number,
   originalStr: string,
   replaceArgs: any[],
   replacementIndex: number,
@@ -33,9 +34,11 @@ export const replaceWithCb: T_replaceWithCb = ({
   return fileContent.replace(regex, (...replaceArgs) => {
     replacementIndex++
 
+    const offset: number = (replaceArgs.slice(-2)[0]: any)
     const [originalStr] = replaceArgs
 
     return cb({
+      offset,
       originalStr,
       replaceArgs,
       replacementIndex,

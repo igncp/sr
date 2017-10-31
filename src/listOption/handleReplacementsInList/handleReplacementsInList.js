@@ -41,12 +41,16 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
     } = replacementsEntries[itemIndex]
 
     const fileContent = await readFile(filePath)
+    let focusPosition = 0
 
     const replaceWithCbFn = ({
+      offset,
       originalStr,
       replacementIndex: localReplacementIndex,
     }) => {
       if (localReplacementIndex === replacementIndex) {
+        focusPosition = offset
+
         return `{black-fg}{white-bg}${searchReplacement}{/white-bg}{/black-fg}`
       }
 
@@ -60,7 +64,10 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
       cb: replaceWithCbFn,
     })
 
-    return newFileContent
+    return {
+      content: newFileContent,
+      focusPosition,
+    }
   }
 
   const onRowSelected = async ({
