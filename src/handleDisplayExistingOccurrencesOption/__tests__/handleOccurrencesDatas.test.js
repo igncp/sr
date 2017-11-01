@@ -48,10 +48,10 @@ describe(_getTopDescribeText(__filename), () => {
 
       expect(result).toEqual([{
         id: 0,
-        value: "filePathValue 1 / 2",
+        value: "1 / 2 filePathValue",
       }, {
         id: 1,
-        value: "filePathValue 2 / 2",
+        value: "2 / 2 filePathValue",
       }])
     })
   })
@@ -75,13 +75,13 @@ describe(_getTopDescribeText(__filename), () => {
 
       expect(getListRows()).toEqual([{
         id: 0,
-        value: "filePathValue 1 / 3",
+        value: "1 / 3 filePathValue",
       }, {
         id: 1,
-        value: "filePathValue 2 / 3",
+        value: "2 / 3 filePathValue",
       }, {
         id: 2,
-        value: "filePathValue 3 / 3",
+        value: "3 / 3 filePathValue",
       }])
 
       await onRowSelected({
@@ -90,10 +90,10 @@ describe(_getTopDescribeText(__filename), () => {
 
       expect(getListRows()).toEqual([{
         id: 0,
-        value: "filePathValue 1 / 3",
+        value: "1 / 3 filePathValue",
       }, {
         id: 2,
-        value: "filePathValue 3 / 3",
+        value: "3 / 3 filePathValue",
       }])
     })
   })

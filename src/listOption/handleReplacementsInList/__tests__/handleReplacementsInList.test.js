@@ -223,7 +223,7 @@ describe(_getTopDescribeText(__filename), () => {
 
       expect(result).toEqual([{
         id: "idValue",
-        value: "filePathValue replacementIndexValue1 / replacementsCountValue",
+        value: "replacementIndexValue1 / replacementsCountValue filePathValue",
       }])
     })
   })

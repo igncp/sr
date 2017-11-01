@@ -30,7 +30,7 @@ describe(_getTopDescribeText(__filename), () => {
 
       await handleEnter()
 
-      expect(args.list.getScroll.mock.calls).toEqual([[]])
+      expect(args.list.getScroll.mock.calls.length).toBeGreaterThan(0)
       expect(args.onEnter.mock.calls).toEqual([[{
         itemIndex: "scrollValue",
       }]])

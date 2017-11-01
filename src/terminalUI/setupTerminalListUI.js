@@ -75,7 +75,7 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
       position: focusPosition || 0,
     })
 
-    const scrollPosition = Math.floor(lineNumber - (previewBox.height / 2))
+    const scrollPosition = Math.floor(lineNumber - (previewBox.height / 3))
 
     previewBox.setContent(content)
     previewBox.scrollTo(scrollPosition < 0 ? 0 : scrollPosition)
@@ -103,12 +103,14 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
 
     list.setItems(rowsValues)
 
-    return true
+    return false
   }
 
   const {
-    handleMoveDown,
     handleEnter,
+    handleMoveDown,
+    handleMovePageDown,
+    handleMovePageUp,
     handleMoveUp,
   } = createListKeysHandlers({
     getRowsLength: () => getListRows().length,
@@ -121,6 +123,8 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
   list.key(["down"], handleMoveDown)
   list.key(["up"], handleMoveUp)
   list.key(["enter"], handleEnter)
+  list.key(["pageup"], handleMovePageUp)
+  list.key(["pagedown"], handleMovePageDown)
   list.key(["right"], () => previewBox.focus())
 
   previewBox.key(["left"], () => list.focus())

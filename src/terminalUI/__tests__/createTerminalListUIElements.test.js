@@ -34,7 +34,7 @@ describe(_getTopDescribeText(__filename), () => {
       listBox: box,
     })
     expect(mockBlessed.list.mock.calls).toEqual([[{
-      height: "100%",
+      height: "99%",
       items: "itemsValue",
       keys: false,
       mouse: true,

@@ -5,6 +5,7 @@ import setupTerminalListUI from "../terminalUI/setupTerminalListUI"
 import type { T_OccurrencesData } from "./findHelpers"
 import { readFile } from "../utils/io"
 import { replaceWithCb } from "../replacementHelpers"
+import { getDisplayedRelativePath } from "../utils/path"
 
 type T_handleOccurrencesData = ({
   findString: string,
@@ -78,7 +79,7 @@ const handleOccurrencesDatas: T_handleOccurrencesData = ({
       getListRows: () => {
         return occurrencesEntries.map(entry => ({
           id: entry.id,
-          value: `${entry.filePath} ${entry.occurrenceIndex + 1} / ${entry.occurrencesCount}`,
+          value: `${entry.occurrenceIndex + 1} / ${entry.occurrencesCount} ${getDisplayedRelativePath(entry.filePath)}`,
         }))
       },
     })

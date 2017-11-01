@@ -43,6 +43,8 @@ beforeEach(() => {
   mockCreateListKeysHandlers.createListKeysHandlers.mockReturnValue({
     handleEnter: "handleEnterValue",
     handleMoveDown: "handleMoveDownValue",
+    handleMovePageDown: "handleMovePageDownValue",
+    handleMovePageUp: "handleMovePageUpValue",
     handleMoveUp: "handleMoveUpValue",
   })
 })
@@ -65,7 +67,7 @@ describe(_getTopDescribeText(__filename), () => {
 
     await setupTerminalListUI(args)
 
-    expect(createListWithBoxReturn.list.key.mock.calls.length).toEqual(4)
+    expect(createListWithBoxReturn.list.key.mock.calls.length).toEqual(6)
     expect(createListWithBoxReturn.list.focus.mock.calls).toEqual([[]])
     expect(createListWithBoxReturn.listBox.focus.mock.calls).toEqual([[]])
 
@@ -86,6 +88,8 @@ describe(_getTopDescribeText(__filename), () => {
       [["down"], "handleMoveDownValue"],
       [["up"], "handleMoveUpValue"],
       [["enter"], "handleEnterValue"],
+      [["pageup"], "handleMovePageUpValue"],
+      [["pagedown"], "handleMovePageDownValue"],
       [["right"], expect.any(Function)],
     ])
 
@@ -182,7 +186,7 @@ describe(_getTopDescribeText(__filename), () => {
       expect(args.onSuccess.mock.calls).toEqual([[{}]])
     })
 
-    it("returns true and calls expected functions if rowsValues.length greater than 0", async () => {
+    it("returns false and calls expected functions if rowsValues.length greater than 0", async () => {
       const args = {
         getListRows: jest.fn(() => [{ value: "valueContent" }]),
         getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
@@ -200,7 +204,7 @@ describe(_getTopDescribeText(__filename), () => {
         itemIndex: "itemIndexValue",
       })
 
-      expect(result).toEqual(true)
+      expect(result).toEqual(false)
       expect(args.onRowSelected.mock.calls).toEqual([[{
         itemIndex: "itemIndexValue",
       }]])

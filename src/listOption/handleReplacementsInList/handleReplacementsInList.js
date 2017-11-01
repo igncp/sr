@@ -6,7 +6,7 @@ import {
   readFile,
   writeFile,
 } from "../../utils/io"
-
+import { getDisplayedRelativePath } from "../../utils/path"
 import setupTerminalListUI from "../../terminalUI/setupTerminalListUI"
 
 import {
@@ -125,7 +125,7 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
       getListRows: () => {
         return replacementsEntries.map(entry => ({
           id: entry.id,
-          value: `${entry.filePath} ${entry.replacementIndex + 1} / ${entry.replacementsCount}`,
+          value: `${entry.replacementIndex + 1} / ${entry.replacementsCount} ${getDisplayedRelativePath(entry.filePath)}`,
         }))
       },
     })

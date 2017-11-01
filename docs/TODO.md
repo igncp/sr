@@ -2,7 +2,7 @@
 
 ### Known Fixes
 
-- Promise exception when not replacing all in the list
+- Scroll item to the middle when selecting row / pageup / pagedown in main list
 
 ### Functionality
 
@@ -14,7 +14,6 @@
 - Add preview to list
 - Add integration tests
 - Add option to convert on the fly / convert at the end (to be able to do ctrl-c)
-- Add option for message of confirmation for all the options
 - Add option to just see the difference
 
 ### Infrastructure

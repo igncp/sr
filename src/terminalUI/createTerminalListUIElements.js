@@ -60,7 +60,7 @@ export const createPreviewBox: T_createPreviewBox = ({
   previewBox.key(["pageup"], () => {
     const scrollRows = getPreviewBoxPageScrollRows(previewBox)
 
-    previewBox.scroll(-scrollRows)
+    previewBox.scroll(-1 * scrollRows)
 
     screen.render()
   })
@@ -123,7 +123,7 @@ export const createListWithBox: T_createListWithBox = ({
     keys: false,
     mouse: true,
     parent: listBox,
-    height: "100%",
+    height: "99%",
     style: {
       selected: {
         fg: colors.blue,

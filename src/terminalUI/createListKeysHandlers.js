@@ -9,6 +9,8 @@ type T_createListKeysHandlers = ({
 }) => {
   handleEnter: () => Promise<void>,
   handleMoveDown: () => Promise<void>,
+  handleMovePageDown: () => Promise<void>,
+  handleMovePageUp: () => Promise<void>,
   handleMoveUp: () => Promise<void>,
 }
 
@@ -21,7 +23,7 @@ export const createListKeysHandlers: T_createListKeysHandlers = ({
 }) => {
   let isInTrasition = false
 
-  const getMoveFn = factor => async () => {
+  const getMoveFn = rowsMoved => async () => {
     if (isInTrasition) {
       return
     }
@@ -31,7 +33,11 @@ export const createListKeysHandlers: T_createListKeysHandlers = ({
     const idx = list.getScroll()
     const rowsLength = getRowsLength()
 
-    let newItemIndex = idx + 1 * factor
+    let newItemIndex = idx + rowsMoved
+
+    if (rowsLength === 0) {
+      return
+    }
 
     if (newItemIndex < 0) {
       newItemIndex = 0
@@ -52,6 +58,9 @@ export const createListKeysHandlers: T_createListKeysHandlers = ({
 
   const handleMoveDown = getMoveFn(1)
   const handleMoveUp = getMoveFn(-1)
+  const handleMoveBecauseDeletion = getMoveFn(0)
+  const handleMovePageUp = getMoveFn(list.height * -1)
+  const handleMovePageDown = getMoveFn(list.height)
 
   const handleEnter = async () => {
     if (isInTrasition) {
@@ -69,10 +78,8 @@ export const createListKeysHandlers: T_createListKeysHandlers = ({
     isInTrasition = false
 
     if (!shouldMove) {
-      return
-    }
-
-    if (idx !== 0) {
+      await handleMoveBecauseDeletion()
+    } else if (idx !== 0) {
       await handleMoveDown()
     } else {
       await handleMoveUp()
@@ -82,6 +89,8 @@ export const createListKeysHandlers: T_createListKeysHandlers = ({
   return {
     handleEnter,
     handleMoveDown,
+    handleMovePageDown,
+    handleMovePageUp,
     handleMoveUp,
   }
 }
