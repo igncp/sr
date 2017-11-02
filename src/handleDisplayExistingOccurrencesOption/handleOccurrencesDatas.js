@@ -34,6 +34,13 @@ const handleOccurrencesDatas: T_handleOccurrencesData = ({
   }) => {
     const entry = occurrencesEntries[itemIndex]
 
+    if (!entry) {
+      return {
+        content: "",
+        focusPosition: 0,
+      }
+    }
+
     const fileContent = await readFile(entry.filePath)
 
     let focusPosition = 0
@@ -71,9 +78,25 @@ const handleOccurrencesDatas: T_handleOccurrencesData = ({
     occurrencesEntries.splice(itemIndex, 1)
   }
 
+  const getHeaderContent = ({
+    itemIndex,
+  }) => {
+    const entry = occurrencesEntries[itemIndex]
+
+    return entry ? `Existing Strings List: ${findString}\n` +
+      `${getDisplayedRelativePath(occurrencesEntries[itemIndex].filePath)}` : ""
+  }
+
   return new Promise((resolve) => {
+    if (occurrencesEntries.length === 0) {
+      resolve()
+
+      return
+    }
+
     setupTerminalListUI({
       getPreviewContentOnMove,
+      getHeaderContent,
       onRowSelected,
       onSuccess: resolve,
       getListRows: () => {

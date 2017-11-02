@@ -109,6 +109,15 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
     })
   }
 
+  const getHeaderContent = ({
+    itemIndex,
+  }) => {
+    const entry = replacementsEntries[itemIndex]
+
+    return entry ? `Replacements List: from ${searchPattern} to ${searchReplacement}\n` +
+      `${getDisplayedRelativePath(replacementsEntries[itemIndex].filePath)} - ${replacementsEntries.length} left` : ""
+  }
+
   return new Promise((resolve) => {
     if (replacementsEntries.length === 0) {
       resolve({
@@ -120,6 +129,7 @@ const handleReplacementsInList: T_handleReplacementsInList = ({
 
     setupTerminalListUI({
       getPreviewContentOnMove,
+      getHeaderContent,
       onRowSelected,
       onSuccess: resolve,
       getListRows: () => {

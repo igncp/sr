@@ -2,9 +2,10 @@
 
 import { getLineNumberOfPositionInString } from "../utils/strings"
 import {
-  createScreen,
+  createHeaderBox,
   createListWithBox,
   createPreviewBox,
+  createScreen,
 } from "./createTerminalListUIElements"
 
 import { createListKeysHandlers } from "./createListKeysHandlers"
@@ -29,18 +30,24 @@ type T_ListRow = {
 
 type T_getListRows = () => Array<T_ListRow>
 
+type T_getHeaderContent = (({|
+  itemIndex: number,
+|})) => string
+
 type T_setupTerminalListUI = ({|
+  getHeaderContent: T_getHeaderContent,
+  getListRows: T_getListRows,
   getPreviewContentOnMove: T_getPreviewContentOnMove,
   onRowSelected: T_onRowSelected,
   onSuccess: T_onSuccess,
-  getListRows: T_getListRows,
 |}) => Promise<void>
 
 const setupTerminalListUI: T_setupTerminalListUI = async ({
+  getHeaderContent,
+  getListRows,
   getPreviewContentOnMove,
   onRowSelected,
   onSuccess,
-  getListRows,
 }) => {
   const getRowsValues = () => getListRows().map(r => r.value)
   const screen = createScreen()
@@ -57,8 +64,15 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
     items: getRowsValues(),
   })
 
+  const {
+    headerBox,
+  } = createHeaderBox({
+    screen,
+  })
+
   screen.append(listBox)
   screen.append(previewBox)
+  screen.append(headerBox)
 
   const onMove = async ({
     itemIndex,
@@ -76,9 +90,13 @@ const setupTerminalListUI: T_setupTerminalListUI = async ({
     })
 
     const scrollPosition = Math.floor(lineNumber - (previewBox.height / 3))
+    const headerContent = getHeaderContent({
+      itemIndex,
+    })
 
     previewBox.setContent(content)
     previewBox.scrollTo(scrollPosition < 0 ? 0 : scrollPosition)
+    headerBox.setContent(headerContent)
   }
 
   const finish = () => {

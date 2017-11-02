@@ -34,7 +34,7 @@ describe(_getTopDescribeText(__filename), () => {
       listBox: box,
     })
     expect(mockBlessed.list.mock.calls).toEqual([[{
-      height: "99%",
+      height: "97%",
       items: "itemsValue",
       keys: false,
       mouse: true,
@@ -65,7 +65,7 @@ describe(_getTopDescribeText(__filename), () => {
       border: {
         type: "line",
       },
-      height: "100%",
+      height: "90%",
       left: 0,
       parent: "screenValue",
       style: {
@@ -79,7 +79,7 @@ describe(_getTopDescribeText(__filename), () => {
         },
       },
       tags: true,
-      top: 0,
+      top: "10%",
       width: "50%",
     }]])
   })
@@ -110,10 +110,10 @@ describe(_getTopDescribeText(__filename), () => {
       })
 
       expect(mockBlessed.box.mock.calls).toEqual([[{
-        top: 0,
+        top: "10%",
         left: "50%",
         width: "50%",
-        height: "100%",
+        height: "90%",
         shadow: true,
         alwaysScroll: true,
         scrollbar: {

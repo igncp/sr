@@ -5,6 +5,7 @@ import program from "commander"
 
 import handleParsedCommandOpts from "./handleParsedCommandOpts"
 import pjson from "../package"
+import logUnhandledRejections from "./logUnhandledRejections"
 
 import type { T_ParsedCommandOpts } from "./commonTypes"
 
@@ -22,6 +23,8 @@ const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
 }
 
 const main = () => {
+  logUnhandledRejections(process)
+
   program
     .version(pjson.version)
     .usage("[options] <searchPath searchPattern replacementString>")

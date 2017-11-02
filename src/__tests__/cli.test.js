@@ -8,9 +8,11 @@ const mockCommander = {
   args: ["firstArgValue", "secondArgValue", "thirdArgValue"],
 }
 const mockHandleParsedCommandOpts = jest.fn()
+const mockLogUnhandledRejections = jest.fn()
 
 jest.mock("../handleParsedCommandOpts", () => mockHandleParsedCommandOpts)
 jest.mock("commander", () => mockCommander)
+jest.mock("../logUnhandledRejections", () => mockLogUnhandledRejections)
 
 const processArgv = process.argv
 
@@ -42,6 +44,7 @@ describe(_getTopDescribeText(__filename), () => {
     ])
     expect(mockCommander.usage.mock.calls).toEqual([["[options] <searchPath searchPattern replacementString>"]])
     expect(mockCommander.parse.mock.calls).toEqual([["processArgvValue"]])
+    expect(mockLogUnhandledRejections.mock.calls).toEqual([[process]])
   })
 
   it("calls handleParsedCommandOpts with the expected result", () => {

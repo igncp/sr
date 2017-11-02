@@ -14,7 +14,9 @@ describe(_getTopDescribeText(__filename), () => {
   const handleOccurrencesDatas = require("../handleOccurrencesDatas").default
 
   it("returns a promise and calls the expected functions", async () => {
-    const occurrencesDatas = [{}]
+    const occurrencesDatas = [{
+      occurrencesCount: 2,
+    }]
     const result = handleOccurrencesDatas({
       findString: "findStringValue",
       occurrencesDatas,
@@ -23,6 +25,7 @@ describe(_getTopDescribeText(__filename), () => {
     expect(result).toBeInstanceOf(Promise)
 
     expect(mockSetupTerminalListUI.mock.calls).toEqual([[{
+      getHeaderContent: expect.any(Function),
       getListRows: expect.any(Function),
       getPreviewContentOnMove: expect.any(Function),
       onRowSelected: expect.any(Function),

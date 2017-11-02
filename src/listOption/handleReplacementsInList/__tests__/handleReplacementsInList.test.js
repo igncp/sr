@@ -53,6 +53,7 @@ describe(_getTopDescribeText(__filename), () => {
 
     expect(result).toBeInstanceOf(Promise)
     expect(mockSetupTerminalListUI.mock.calls).toEqual([[{
+      getHeaderContent: expect.any(Function),
       getListRows: expect.any(Function),
       getPreviewContentOnMove: expect.any(Function),
       onRowSelected: expect.any(Function),

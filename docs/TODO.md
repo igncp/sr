@@ -7,10 +7,9 @@
 ### Functionality
 
 - Improve preview message when displaying list
-  - Display explanation of the list
   - Add keys helpers
   - Display difference
-  - Better movement
+  - Better movement keys
 - Add preview to list
 - Add integration tests
 - Add option to convert on the fly / convert at the end (to be able to do ctrl-c)

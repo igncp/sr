@@ -2,9 +2,10 @@ const mockCreateListKeysHandlers = {
   createListKeysHandlers: jest.fn(),
 }
 const mockCreateTerminalListUIElements = {
-  createScreen: jest.fn(),
+  createHeaderBox: jest.fn(),
   createListWithBox: jest.fn(),
   createPreviewBox: jest.fn(),
+  createScreen: jest.fn(),
 }
 
 jest.mock("../createListKeysHandlers", () => mockCreateListKeysHandlers)
@@ -36,10 +37,17 @@ const createScreenReturn = {
   render: jest.fn(),
 }
 
+const createHeaderBoxReturn = {
+  headerBox: {
+    setContent: jest.fn(),
+  },
+}
+
 beforeEach(() => {
   mockCreateTerminalListUIElements.createListWithBox.mockReturnValue(createListWithBoxReturn)
   mockCreateTerminalListUIElements.createPreviewBox.mockReturnValue(createPreviewBoxReturn)
   mockCreateTerminalListUIElements.createScreen.mockReturnValue(createScreenReturn)
+  mockCreateTerminalListUIElements.createHeaderBox.mockReturnValue(createHeaderBoxReturn)
   mockCreateListKeysHandlers.createListKeysHandlers.mockReturnValue({
     handleEnter: "handleEnterValue",
     handleMoveDown: "handleMoveDownValue",
@@ -63,6 +71,7 @@ describe(_getTopDescribeText(__filename), () => {
     const args = {
       getListRows: jest.fn(() => []),
       getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
+      getHeaderContent: jest.fn().mockReturnValue("getHeaderContentValue"),
     }
 
     await setupTerminalListUI(args)
@@ -73,12 +82,20 @@ describe(_getTopDescribeText(__filename), () => {
 
     expect(createPreviewBoxReturn.key.mock.calls.length).toEqual(1)
     expect(createPreviewBoxReturn.setContent.mock.calls).toEqual([["previewContentValue"]])
+    expect(createHeaderBoxReturn.headerBox.setContent.mock.calls).toEqual([["getHeaderContentValue"]])
 
-    expect(createScreenReturn.append.mock.calls).toEqual([[createListWithBoxReturn.listBox], [createPreviewBoxReturn]])
+    expect(createScreenReturn.append.mock.calls).toEqual([
+      [createListWithBoxReturn.listBox],
+      [createPreviewBoxReturn],
+      [createHeaderBoxReturn.headerBox],
+    ])
     expect(createScreenReturn.key.mock.calls.length).toEqual(1)
     expect(createScreenReturn.render.mock.calls).toEqual([[]])
 
     expect(args.getListRows.mock.calls).toEqual([[]])
+    expect(args.getHeaderContent.mock.calls).toEqual([[{
+      itemIndex: 0,
+    }]])
     expect(args.getPreviewContentOnMove.mock.calls).toEqual([[{
       itemIndex: 0,
     }]])
@@ -114,6 +131,7 @@ describe(_getTopDescribeText(__filename), () => {
     beforeEach(async () => {
       const args = {
         getListRows: jest.fn(() => []),
+        getHeaderContent: jest.fn(),
         getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
       }
 
@@ -145,6 +163,7 @@ describe(_getTopDescribeText(__filename), () => {
     const args = {
       getListRows: jest.fn(() => [{}, {}]),
       getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
+      getHeaderContent: jest.fn(),
     }
 
     await setupTerminalListUI(args)
@@ -161,6 +180,7 @@ describe(_getTopDescribeText(__filename), () => {
   describe("onEnter", () => {
     it("returns false and calls expected functions if rowsValues.length is 0", async () => {
       const args = {
+        getHeaderContent: jest.fn(),
         getListRows: jest.fn(() => []),
         getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
         onRowSelected: jest.fn(),
@@ -190,6 +210,7 @@ describe(_getTopDescribeText(__filename), () => {
       const args = {
         getListRows: jest.fn(() => [{ value: "valueContent" }]),
         getPreviewContentOnMove: getCommonPreviewContentOnMoveFn(),
+        getHeaderContent: jest.fn(),
         onRowSelected: jest.fn(),
         onSuccess: jest.fn(),
       }

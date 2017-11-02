@@ -15,6 +15,12 @@ type T_createListWithBox = ({
 
 type T_createScreen = () => any
 
+type T_createHeaderBox = ({|
+  screen: any,
+|}) => {|
+  headerBox: any,
+|}
+
 const getPreviewBoxPageScrollRows = (previewBox) => {
   const scrollRows = Math.floor((previewBox.height - 2) / 2)
 
@@ -25,10 +31,10 @@ export const createPreviewBox: T_createPreviewBox = ({
   screen,
 }) => {
   const previewBox = blessed.box({
-    top: 0,
+    top: "10%",
     left: "50%",
     width: "50%",
-    height: "100%",
+    height: "90%",
     shadow: true,
     alwaysScroll: true,
     scrollbar: {
@@ -100,7 +106,7 @@ export const createListWithBox: T_createListWithBox = ({
     border: {
       type: "line",
     },
-    height: "100%",
+    height: "90%",
     left: 0,
     parent: screen,
     style: {
@@ -114,7 +120,7 @@ export const createListWithBox: T_createListWithBox = ({
       },
     },
     tags: true,
-    top: 0,
+    top: "10%",
     width: "50%",
   })
 
@@ -123,7 +129,7 @@ export const createListWithBox: T_createListWithBox = ({
     keys: false,
     mouse: true,
     parent: listBox,
-    height: "99%",
+    height: "97%",
     style: {
       selected: {
         fg: colors.blue,
@@ -161,6 +167,39 @@ export const createScreen: T_createScreen = () => {
   })
 
   return screen
+}
+
+export const createHeaderBox: T_createHeaderBox = ({
+  screen,
+}) => {
+  const headerBox = blessed.box({
+    border: {
+      type: "line",
+    },
+    height: "9%",
+    left: 0,
+    parent: screen,
+    style: {
+      fg: colors.white,
+      bg: colors.black,
+      border: {
+        fg: colors.white,
+      },
+      focus: {
+        bg: colors.grey,
+      },
+    },
+    tags: true,
+    top: 0,
+    width: "100%",
+    content: "",
+    align: "center",
+    valign: "middle",
+  })
+
+  return {
+    headerBox,
+  }
 }
 
 // istanbul ignore else
