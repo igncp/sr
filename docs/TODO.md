@@ -6,6 +6,7 @@
 
 ### Functionality
 
+- Accept set of files from pipe (e.g. `find . -type f | sr search replacement`)
 - Improve preview message when displaying list
   - Add keys helpers
   - Display difference
