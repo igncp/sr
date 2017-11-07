@@ -12,9 +12,9 @@
     "prepublish": "yarn run test && yarn run build",
     "prepush": "sh helpers/gitHooks/prepush.sh",
     "test": "jest",
-    "test:coverage": "yarn run test -- --coverage",
+    "test:coverage": "yarn run test --coverage",
     "test:travis": "yarn run test:coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "watch": "yarn run build -- --watch"
+    "watch": "yarn run build --watch"
   },
   "author": "Ignacio Carbajo <icarbarbajop@gmail.com>",
   "license": "ISC",
@@ -22,6 +22,7 @@
     "blessed": "^0.1.81",
     "chalk": "^2.1.0",
     "commander": "^2.11.0",
+    "get-stdin": "^5.0.1",
     "inquirer": "^3.3.0",
     "walk": "^2.3.9"
   },

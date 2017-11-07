@@ -1,6 +1,7 @@
 // @flow
 
 export type T_ParsedCommandOpts = ExactSpreadWorkaround<{|
+  filesList: ?string[],
   searchPath: string,
   searchPattern: string,
   searchReplacement: string,

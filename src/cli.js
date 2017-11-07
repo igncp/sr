@@ -2,6 +2,7 @@
 // @flow
 
 import program from "commander"
+import getStdin from "get-stdin"
 
 import handleParsedCommandOpts from "./handleParsedCommandOpts"
 import pjson from "../package"
@@ -9,11 +10,16 @@ import logUnhandledRejections from "./logUnhandledRejections"
 
 import type { T_ParsedCommandOpts } from "./commonTypes"
 
-const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
+const extractCommandOpts = (parsedProgram, filesListStr): T_ParsedCommandOpts => {
+  const filesList = typeof filesListStr === 'string'
+    ? filesListStr.split('\n').filter(s => !!s.trim())
+    : null
+
   return {
-    searchPath: parsedProgram.args[0],
-    searchPattern: parsedProgram.args[1],
-    searchReplacement: parsedProgram.args[2],
+    filesList,
+    searchPath: filesList ? '' : parsedProgram.args[0],
+    searchPattern: filesList ? parsedProgram.args[0] : parsedProgram.args[1],
+    searchReplacement: filesList ? parsedProgram.args[1] : parsedProgram.args[2],
     shouldBeCaseSensitive: !parsedProgram.caseInsensitive,
     shouldBePreview: !!parsedProgram.preview,
     shouldConfirmOptions: !!parsedProgram.confirm,
@@ -22,8 +28,12 @@ const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
   }
 }
 
-const main = () => {
+const main = async () => {
   logUnhandledRejections(process)
+
+  const filesListStr = process.stdin.isTTY
+    ? null
+    : await getStdin()
 
   program
     .version(pjson.version)
@@ -35,7 +45,7 @@ const main = () => {
     .option("--disable-list", "disable list to select replacements interactively")
     .parse(process.argv)
 
-  const commandOpts = extractCommandOpts(program)
+  const commandOpts = extractCommandOpts(program, filesListStr)
 
   // validateCommandOpts(commandOpts)
 
