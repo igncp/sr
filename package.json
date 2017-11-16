@@ -1,6 +1,6 @@
 {
   "name": "sr-igncp",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Search and replace for the command line",
   "main": "index.js",
   "bin": {
