@@ -14,11 +14,16 @@ const extractCommandOpts = (parsedProgram, filesListStr): T_ParsedCommandOpts =>
   const filesList = typeof filesListStr === 'string'
     ? filesListStr.split('\n').filter(s => !!s.trim())
     : null
+  let searchPattern = filesList ? parsedProgram.args[0] : parsedProgram.args[1]
+
+  if (searchPattern && parsedProgram.delimiters) {
+    searchPattern = `\\b${searchPattern}\\b`
+  }
 
   return {
     filesList,
     searchPath: filesList ? '' : parsedProgram.args[0],
-    searchPattern: filesList ? parsedProgram.args[0] : parsedProgram.args[1],
+    searchPattern,
     searchReplacement: filesList ? parsedProgram.args[1] : parsedProgram.args[2],
     shouldBeCaseSensitive: !parsedProgram.caseInsensitive,
     shouldBePreview: !!parsedProgram.preview,
@@ -42,6 +47,7 @@ const main = async () => {
     .option("-p, --preview", "preview results without modifying files (not applicable to list) [default=false]")
     .option("-c, --confirm", "confirm selection of options [default=false]")
     .option("-e, --existing", "show existing matches of the replacement string, in a list")
+    .option("-d, --delimiters", "adds word delimeters to the search pattern [default=false]")
     .option("--disable-list", "disable list to select replacements interactively")
     .parse(process.argv)
 
