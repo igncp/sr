@@ -10,9 +10,15 @@ import logUnhandledRejections from "./logUnhandledRejections"
 import type { T_ParsedCommandOpts } from "./commonTypes"
 
 const extractCommandOpts = (parsedProgram): T_ParsedCommandOpts => {
+  let searchPattern = parsedProgram.args[1]
+
+  if (searchPattern && parsedProgram.delimiters) {
+    searchPattern = `\\b${searchPattern}\\b`
+  }
+
   return {
     searchPath: parsedProgram.args[0],
-    searchPattern: parsedProgram.args[1],
+    searchPattern,
     searchReplacement: parsedProgram.args[2],
     shouldBeCaseSensitive: !parsedProgram.caseInsensitive,
     shouldBePreview: !!parsedProgram.preview,
@@ -32,6 +38,7 @@ const main = () => {
     .option("-p, --preview", "preview results without modifying files (not applicable to list) [default=false]")
     .option("-c, --confirm", "confirm selection of options [default=false]")
     .option("-e, --existing", "show existing matches of the replacement string, in a list")
+    .option("-d, --delimiters", "adds word delimeters to the search pattern [default=false]")
     .option("--disable-list", "disable list to select replacements interactively")
     .parse(process.argv)
 

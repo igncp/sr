@@ -18,6 +18,8 @@ const processArgv = process.argv
 
 beforeEach(() => {
   process.argv = "processArgvValue"
+
+  mockCommander.delimiters = null
   mockCommander.version.mockImplementation(() => mockCommander)
   mockCommander.option.mockImplementation(() => mockCommander)
   mockCommander.usage.mockImplementation(() => mockCommander)
@@ -40,6 +42,7 @@ describe(_getTopDescribeText(__filename), () => {
       ["-p, --preview", "preview results without modifying files (not applicable to list) [default=false]"],
       ["-c, --confirm", "confirm selection of options [default=false]"],
       ["-e, --existing", "show existing matches of the replacement string, in a list"],
+      ["-d, --delimiters", "adds word delimeters to the search pattern [default=false]"],
       ["--disable-list", "disable list to select replacements interactively"],
     ])
     expect(mockCommander.usage.mock.calls).toEqual([["[options] <searchPath searchPattern replacementString>"]])
@@ -53,6 +56,23 @@ describe(_getTopDescribeText(__filename), () => {
     expect(mockHandleParsedCommandOpts.mock.calls).toEqual([[{
       searchPath: "firstArgValue",
       searchPattern: "secondArgValue",
+      searchReplacement: "thirdArgValue",
+      shouldBeCaseSensitive: true,
+      shouldBePreview: false,
+      shouldConfirmOptions: false,
+      shouldDisplayExisting: false,
+      shouldUseList: true,
+    }]])
+  })
+
+  it("calls handleParsedCommandOpts with the expected result when passing delimiters", () => {
+    mockCommander.delimiters = true
+
+    cli()
+
+    expect(mockHandleParsedCommandOpts.mock.calls).toEqual([[{
+      searchPath: "firstArgValue",
+      searchPattern: "\\bsecondArgValue\\b",
       searchReplacement: "thirdArgValue",
       shouldBeCaseSensitive: true,
       shouldBePreview: false,
