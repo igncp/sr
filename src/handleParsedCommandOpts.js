@@ -33,7 +33,7 @@ const buildFinalOptions = (parsedCommandOpts, answers): T_FinalOptions => {
 }
 
 const validateFinalOptions = (finalOptions) => {
-  if (!finalOptions.searchPath && process.stdin.isTTY) {
+  if (!finalOptions.searchPath) {
     exitWithError(texts.ERRORS.MISSING_PATH)
   }
 }
