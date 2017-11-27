@@ -43,7 +43,11 @@ const extractCommandOpts = async (parsedProgram): Promise<T_ParsedCommandOpts> =
   }
 }
 
-const main = async () => {
+const main = async ({
+  process,
+}: {
+  process: any,
+}) => {
   logUnhandledRejections(process)
 
   if (!process.stdin.isTTY) {
@@ -71,5 +75,7 @@ const main = async () => {
 if (global.__TEST__) {
   module.exports = main
 } else {
-  main()
+  main({
+    process,
+  })
 }

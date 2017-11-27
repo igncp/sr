@@ -9,16 +9,18 @@ const mockCommander = {
 }
 const mockHandleParsedCommandOpts = jest.fn()
 const mockLogUnhandledRejections = jest.fn()
+const mockProcess = {
+  argv: "processArgvValue",
+  stdin: {
+    isTTY: true,
+  },
+}
 
 jest.mock("../handleParsedCommandOpts", () => mockHandleParsedCommandOpts)
 jest.mock("commander", () => mockCommander)
 jest.mock("../logUnhandledRejections", () => mockLogUnhandledRejections)
 
-const processArgv = process.argv
-
 beforeEach(() => {
-  process.argv = "processArgvValue"
-
   mockCommander.delimiters = null
   mockCommander.version.mockImplementation(() => mockCommander)
   mockCommander.option.mockImplementation(() => mockCommander)
@@ -26,15 +28,13 @@ beforeEach(() => {
   mockCommander.parse.mockImplementation(() => mockCommander)
 })
 
-afterEach(() => {
-  process.argv = processArgv
-})
-
 describe(_getTopDescribeText(__filename), () => {
   const cli = require("../cli")
 
   it("calls the expected functions", () => {
-    cli()
+    cli({
+      process: mockProcess,
+    })
 
     expect(mockCommander.version.mock.calls).toEqual([[pjson.version]])
     expect(mockCommander.option.mock.calls).toEqual([
@@ -48,11 +48,13 @@ describe(_getTopDescribeText(__filename), () => {
     ])
     expect(mockCommander.usage.mock.calls).toEqual([["[options] <searchPath searchPattern replacementString>"]])
     expect(mockCommander.parse.mock.calls).toEqual([["processArgvValue"]])
-    expect(mockLogUnhandledRejections.mock.calls).toEqual([[process]])
+    expect(mockLogUnhandledRejections.mock.calls).toEqual([[mockProcess]])
   })
 
   it("calls handleParsedCommandOpts with the expected result", async () => {
-    await cli()
+    await cli({
+      process: mockProcess,
+    })
 
     expect(mockHandleParsedCommandOpts.mock.calls).toEqual([[{
       filesList: null,
@@ -70,7 +72,9 @@ describe(_getTopDescribeText(__filename), () => {
   it("calls handleParsedCommandOpts with the expected result when passing delimiters", async () => {
     mockCommander.delimiters = true
 
-    await cli()
+    await cli({
+      process: mockProcess,
+    })
 
     expect(mockHandleParsedCommandOpts.mock.calls).toEqual([[{
       filesList: null,
