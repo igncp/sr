@@ -96,10 +96,6 @@ export const confirmOptions = async (finalOptions: T_FinalOptions) => {
 }
 
 export const getAnswersForFinalOptions = async (parsedCommandOpts: T_ParsedCommandOpts) => {
-  if (!process.stdin.isTTY) {
-    return {}
-  }
-
   const questions = buildQuestions(parsedCommandOpts)
   const answers = await inquirer.prompt(questions)
 

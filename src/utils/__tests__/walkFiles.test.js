@@ -23,7 +23,7 @@ describe(_getTopDescribeText(__filename), () => {
   const walkFiles = require("../walkFiles").default
 
   it("calls the expected functions", async () => {
-    await walkFiles({
+    walkFiles({
       walkPath: "walkPathValue",
       handleFile: "handleFileValue",
       handleEnd: "handleEndValue",
@@ -34,7 +34,27 @@ describe(_getTopDescribeText(__filename), () => {
 
     expect(mockWalker.on.mock.calls).toEqual([
       ["file", "handleFileValue"],
-      ["end", "handleEndValue"],
+      ["end", expect.any(Function)],
     ])
+  })
+
+  it("calls handleEnd on finished", async () => {
+    const handleEnd = jest.fn()
+    const promise = walkFiles({
+      walkPath: "walkPathValue",
+      handleFile: "handleFileValue",
+      handleEnd,
+    })
+
+    const resolveTriggerFn = mockWalker.on.mock.calls
+      .find(c => c[0] === "end")[1]
+
+    resolveTriggerFn()
+
+    expect(handleEnd.mock.calls).toEqual([])
+
+    await promise
+
+    expect(handleEnd.mock.calls).toEqual([[]])
   })
 })

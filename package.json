@@ -22,7 +22,6 @@
     "blessed": "^0.1.81",
     "chalk": "^2.1.0",
     "commander": "^2.11.0",
-    "get-stdin": "^5.0.1",
     "inquirer": "^3.3.0",
     "walk": "^2.3.9"
   },

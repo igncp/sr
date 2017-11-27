@@ -111,6 +111,7 @@ const walkFilesForReplacements: T_walkFilesForReplacements = async (finalOptions
 
   walkFiles({
     walkPath: finalOptions.searchPath,
+    filesList: finalOptions.filesList,
     handleFile,
     handleEnd,
   })

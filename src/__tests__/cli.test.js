@@ -43,6 +43,7 @@ describe(_getTopDescribeText(__filename), () => {
       ["-c, --confirm", "confirm selection of options [default=false]"],
       ["-e, --existing", "show existing matches of the replacement string, in a list"],
       ["-d, --delimiters", "adds word delimeters to the search pattern [default=false]"],
+      ["-f, --files-list-path", "opens this file and uses the files paths inside"],
       ["--disable-list", "disable list to select replacements interactively"],
     ])
     expect(mockCommander.usage.mock.calls).toEqual([["[options] <searchPath searchPattern replacementString>"]])
@@ -50,10 +51,11 @@ describe(_getTopDescribeText(__filename), () => {
     expect(mockLogUnhandledRejections.mock.calls).toEqual([[process]])
   })
 
-  it("calls handleParsedCommandOpts with the expected result", () => {
-    cli()
+  it("calls handleParsedCommandOpts with the expected result", async () => {
+    await cli()
 
     expect(mockHandleParsedCommandOpts.mock.calls).toEqual([[{
+      filesList: null,
       searchPath: "firstArgValue",
       searchPattern: "secondArgValue",
       searchReplacement: "thirdArgValue",
@@ -65,12 +67,13 @@ describe(_getTopDescribeText(__filename), () => {
     }]])
   })
 
-  it("calls handleParsedCommandOpts with the expected result when passing delimiters", () => {
+  it("calls handleParsedCommandOpts with the expected result when passing delimiters", async () => {
     mockCommander.delimiters = true
 
-    cli()
+    await cli()
 
     expect(mockHandleParsedCommandOpts.mock.calls).toEqual([[{
+      filesList: null,
       searchPath: "firstArgValue",
       searchPattern: "\\bsecondArgValue\\b",
       searchReplacement: "thirdArgValue",

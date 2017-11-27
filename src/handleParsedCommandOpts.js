@@ -20,6 +20,7 @@ const buildFinalOptions = (parsedCommandOpts, answers): T_FinalOptions => {
   const searchPath = (parsedCommandOpts.searchPath || answers.path || "").replace(/\/$/, "")
 
   return {
+    filesList: parsedCommandOpts.filesList,
     searchPath,
     searchPattern: parsedCommandOpts.searchPattern || answers.search,
     searchReplacement: parsedCommandOpts.searchReplacement || answers.replace,
@@ -49,6 +50,7 @@ const handleParsedCommandOpts: T_handleParsedCommandOpts = async (parsedCommandO
 
   if (finalOptions.shouldDisplayExisting) {
     await walkFilesForDisplayingExisting({
+      filesList: finalOptions.filesList,
       searchPath: finalOptions.searchPath,
       searchReplacement: finalOptions.searchReplacement,
     })

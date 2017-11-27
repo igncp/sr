@@ -37,11 +37,13 @@ const getHandleEndFn = ({
 }
 
 type T_walkFilesForDisplayingExisting = ({|
+  filesList: ?string[],
   searchPath: string,
   searchReplacement: string,
 |}) => Promise<void>
 
 const walkFilesForDisplayingExisting: T_walkFilesForDisplayingExisting = ({
+  filesList,
   searchPath,
   searchReplacement,
 }) => {
@@ -64,9 +66,10 @@ const walkFilesForDisplayingExisting: T_walkFilesForDisplayingExisting = ({
     })
 
     walkFiles({
-      walkPath: searchPath,
-      handleFile,
+      filesList,
       handleEnd,
+      handleFile,
+      walkPath: searchPath,
     })
   })
 }

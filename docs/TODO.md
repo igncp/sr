@@ -3,10 +3,10 @@
 ### Known Fixes
 
 - Scroll item to the middle when selecting row / pageup / pagedown in main list
+- Highlight centering for long files
 
 ### Functionality
 
-- Accept set of files from pipe (e.g. `find . -type f | sr search replacement`)
 - Improve preview message when displaying list
   - Add keys helpers
   - Display difference
@@ -30,3 +30,8 @@
 ### Refactors
 
 None
+
+### Discarded
+
+- Accept set of files from pipe (e.g. `find . -type f | sr search replacement`)
+  - This is discarded due to blessed.js not working when the terminal is not a TTY. Added the `-f` function instead

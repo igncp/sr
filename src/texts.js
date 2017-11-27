@@ -13,6 +13,7 @@ const texts = {
   ERRORS: {
     MISSING_SEARCH: "Please, you must specify a search pattern",
     MISSING_PATH: "Please, you must specify a search path",
+    PIPE_UNSUPPORTED: "Piping to sr is not supported. You can use a list of files paths with the -f option",
   },
 }
 
