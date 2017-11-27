@@ -21,7 +21,3 @@ declare module "inquirer" {
 declare module "blessed" {
   declare export default any
 }
-
-declare module "get-stdin" {
-  declare export default any
-}
