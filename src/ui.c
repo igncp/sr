@@ -35,6 +35,11 @@ void paintMatchRow(MatchItem * node, int line_idx, struct LoopOpts * opts)
     mvwprintw(opts->window, line_idx+1, 2, "%s", item );
 }
 
+int getScreenMaxDisplayedLines(void)
+{
+    return LINES - 3;
+}
+
 void updateScreenItems(struct LoopOpts * opts)
 {
     MatchItem * node = opts->matches_screen->screen_item;
@@ -44,7 +49,7 @@ void updateScreenItems(struct LoopOpts * opts)
     i = 0;
     while (true)
     {
-        if (i == LINES - 3)
+        if (i == getScreenMaxDisplayedLines())
         {
             break;
         }
@@ -141,22 +146,67 @@ void tryMovingSelectedLine(
             matches_screen->first_displayed_match_index = 0;
         }
 
-        MatchItem * first_item = MatchItem_getItemN(all_matched_item, matches_screen->first_displayed_match_index);
+        MatchItem * first_item = MatchItem_getItemN(
+            all_matched_item,
+            matches_screen->first_displayed_match_index
+        );
         matches_screen->screen_item = MatchItem_getNItems(first_item, matches_screen->screen_items_count);
     }
+}
+
+MatchItem * getScreenItemsFromMatchItem(MatchItem * first_screen_item) {
+    int max_displayed_lines = getScreenMaxDisplayedLines();
+    return MatchItem_getNItems(first_screen_item, max_displayed_lines);
+}
+
+void replaceEntry(MatchItem ** all_matched_item, struct MatchesListScreen * matches_screen)
+{
+    int all_matched_items_count = MatchItem_countList(*all_matched_item);
+    int replaced_entry_index = matches_screen->line_focused_index + matches_screen->first_displayed_match_index;
+
+    if (replaced_entry_index == 0) {
+        MatchItem * r =  *all_matched_item;
+
+        *all_matched_item = (*all_matched_item)->next;
+
+        free(r);
+    } else {
+        MatchItem * r =  MatchItem_getItemN(*all_matched_item, replaced_entry_index - 1);
+
+        if (replaced_entry_index == all_matched_items_count - 1) {
+            free(r->next);
+
+            r->next = NULL;
+
+            matches_screen->line_focused_index -= 1;
+        } else {
+            MatchItem * n = r->next;
+
+            r->next = r->next->next;
+
+            free(n);
+        }
+    }
+
+    MatchItem_deleteList(matches_screen->screen_item);
+
+    MatchItem * f =  MatchItem_getItemN(*all_matched_item, matches_screen->first_displayed_match_index);
+
+    matches_screen->screen_item = getScreenItemsFromMatchItem(f);
+    matches_screen->screen_items_count = MatchItem_countList(matches_screen->screen_item);
 }
 
 void waitForKey(struct LoopOpts * opts)
 {
     struct MatchesListScreen * matches_screen = opts->matches_screen;
 
-    int screen_matched_item_count = MatchItem_countList(
-        matches_screen->screen_item
-    );
-
     int ch;
     while((ch = wgetch(opts->window)) != 'q')
     {
+        int screen_matched_item_count = MatchItem_countList(
+            matches_screen->screen_item
+        );
+
         // right pad with spaces to make the items appear with even width.
         paintMatchRow(
             MatchItem_getItemN(
@@ -206,6 +256,16 @@ void waitForKey(struct LoopOpts * opts)
         }
         else if (ch == KEY_ENTER_FIXED)
         {
+            replaceEntry(
+                &opts->all_matched_item,
+                matches_screen
+            );
+
+            updateScreenItems(opts);
+        }
+
+
+        if(matches_screen->screen_item == NULL) {
             break;
         }
 
@@ -232,7 +292,7 @@ void UI_listMatches(MatchItem * all_matched_item)
     w = newwin( LINES - 1, COLS - 1, 1, 1 ); // create a new window
     box( w, 0, 0 ); // sets default borders for the window
 
-    MatchItem * screen_matched_item = MatchItem_getNItems(all_matched_item, LINES - 3);
+    MatchItem * screen_matched_item = getScreenItemsFromMatchItem(all_matched_item);
 
     struct MatchesListScreen matches_screen;
 

@@ -10,7 +10,9 @@ typedef struct MatchItem
 } MatchItem;
 
 int MatchItem_countList(MatchItem * initial_node);
+
 void MatchItem_copyDataToFrom(MatchItem * dest, MatchItem * src);
+void MatchItem_deleteList(MatchItem * item);
 
 MatchItem * MatchItem_getItemN(MatchItem * initial_node, int n);
 MatchItem * MatchItem_getLast(MatchItem * initial_node);

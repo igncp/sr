@@ -145,3 +145,22 @@ MatchItem * MatchItem_moveFirstToEnd(MatchItem * item)
 
     return next;
 }
+
+void MatchItem_deleteList(MatchItem * item)
+{
+    MatchItem * node = item;
+
+    while (true)
+    {
+        if (node == NULL)
+        {
+            return;
+        }
+
+        MatchItem * old_node = node;
+
+        node = node->next;
+
+        free(old_node);
+    }
+}

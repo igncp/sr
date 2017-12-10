@@ -2,7 +2,7 @@
 
 ## Issues
 
-None.
+- Handle long file names
 
 ## Refactors
 
