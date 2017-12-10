@@ -21,64 +21,6 @@ struct LoopOpts
     WINDOW * window;
 };
 
-void moveScreenItems(
-    MatchItem * all_matched_item,
-    struct MatchesListScreen * matches_screen,
-    int movement
-)
-{
-    int all_matched_items_count = MatchItem_countList(all_matched_item);
-    int screen_matched_item_count = matches_screen->screen_items_count;
-
-    if (movement == 1)
-    {
-        if (
-            screen_matched_item_count + matches_screen->first_displayed_match_index <
-            all_matched_items_count
-        )
-        {
-            MatchItem * next_item =
-                MatchItem_getItemN(
-                    all_matched_item,
-                    screen_matched_item_count +
-                    matches_screen->first_displayed_match_index
-                );
-            MatchItem * last_item =
-                MatchItem_getItemN(
-                    matches_screen->screen_item,
-                    screen_matched_item_count - 1
-                );
-
-            last_item->next = MatchItem_copySingle(next_item);
-
-            MatchItem * item_to_remove = matches_screen->screen_item;
-
-            matches_screen->screen_item = matches_screen->screen_item->next;
-
-            free(item_to_remove);
-        }
-    }
-    else if(movement == -1)
-    {
-        MatchItem * prev_item = MatchItem_getItemN(
-            all_matched_item,
-            matches_screen->first_displayed_match_index - 1
-        );
-        MatchItem * prev_to_last_item = MatchItem_getItemN(
-            matches_screen->screen_item,
-            screen_matched_item_count - 2
-        );
-
-        free(prev_to_last_item->next);
-        prev_to_last_item->next = NULL;
-
-        MatchItem * prev_item_copy = MatchItem_copySingle(prev_item);
-        prev_item_copy->next = matches_screen->screen_item;
-
-        matches_screen->screen_item = prev_item_copy;
-    }
-}
-
 void paintMatchRow(MatchItem * node, int line_idx, struct LoopOpts * opts)
 {
     char item[1024];
@@ -209,11 +151,8 @@ void waitForKey(struct LoopOpts * opts)
     struct MatchesListScreen * matches_screen = opts->matches_screen;
 
     int screen_matched_item_count = MatchItem_countList(
-                                        matches_screen->screen_item
-                                    );
-    int all_matched_items_count = MatchItem_countList(opts->all_matched_item);
-
-    int items_position = 0;
+        matches_screen->screen_item
+    );
 
     int ch;
     while((ch = wgetch(opts->window)) != 'q')
