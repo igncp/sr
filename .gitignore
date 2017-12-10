@@ -1,5 +1,3 @@
-/node_modules
-/ignored
-/lib
-/coverage
-*.log
+ignored
+build
+*.orig
