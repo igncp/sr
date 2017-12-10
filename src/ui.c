@@ -11,7 +11,7 @@ struct MatchesListScreen
 
     int first_displayed_match_index;
     int line_focused_index;
-    int sceen_items_count;
+    int screen_items_count;
 };
 
 struct LoopOpts
@@ -21,21 +21,27 @@ struct LoopOpts
     WINDOW * window;
 };
 
-// movement: 1 -> down, -1 up
-void moveScreenItems(struct LoopOpts * opts, int pos, int movement)
+void moveScreenItems(
+    MatchItem * all_matched_item,
+    struct MatchesListScreen * matches_screen,
+    int movement
+)
 {
-    int all_matched_items_count = MatchItem_countList(opts->all_matched_item);
-    struct MatchesListScreen * matches_screen = opts->matches_screen;
-    int screen_matched_item_count = matches_screen->sceen_items_count;
+    int all_matched_items_count = MatchItem_countList(all_matched_item);
+    int screen_matched_item_count = matches_screen->screen_items_count;
 
     if (movement == 1)
     {
-        if (screen_matched_item_count + pos < all_matched_items_count)
+        if (
+            screen_matched_item_count + matches_screen->first_displayed_match_index <
+            all_matched_items_count
+        )
         {
             MatchItem * next_item =
                 MatchItem_getItemN(
-                    opts->all_matched_item,
-                    screen_matched_item_count + pos
+                    all_matched_item,
+                    screen_matched_item_count +
+                    matches_screen->first_displayed_match_index
                 );
             MatchItem * last_item =
                 MatchItem_getItemN(
@@ -54,13 +60,14 @@ void moveScreenItems(struct LoopOpts * opts, int pos, int movement)
     }
     else if(movement == -1)
     {
-        MatchItem * prev_item =
-            MatchItem_getItemN(opts->all_matched_item, pos - 1);
-        MatchItem * prev_to_last_item =
-            MatchItem_getItemN(
-                matches_screen->screen_item,
-                screen_matched_item_count - 2
-            );
+        MatchItem * prev_item = MatchItem_getItemN(
+            all_matched_item,
+            matches_screen->first_displayed_match_index - 1
+        );
+        MatchItem * prev_to_last_item = MatchItem_getItemN(
+            matches_screen->screen_item,
+            screen_matched_item_count - 2
+        );
 
         free(prev_to_last_item->next);
         prev_to_last_item->next = NULL;
@@ -76,7 +83,13 @@ void paintMatchRow(MatchItem * node, int line_idx, struct LoopOpts * opts)
 {
     char item[1024];
 
-    sprintf(item, "%ld / %ld - %s", node->index + 1, node->total, node->path);
+    sprintf(
+        item,
+        "%ld / %ld - %s",
+        node->index + 1,
+        node->total,
+        node->path
+    );
     mvwprintw(opts->window, line_idx+1, 2, "%s", item );
 }
 
@@ -116,13 +129,88 @@ void updateScreenItems(struct LoopOpts * opts)
     wrefresh( opts->window ); // update the terminal screen
 }
 
+void tryMovingSelectedLine(
+    MatchItem * all_matched_item,
+    struct MatchesListScreen * matches_screen,
+    int movement_positions
+)
+{
+    int all_matched_items_count = MatchItem_countList(all_matched_item);
+    int screen_matched_item_count = matches_screen->screen_items_count;
+
+    if (all_matched_items_count == screen_matched_item_count)
+    {
+        matches_screen->line_focused_index += movement_positions;
+
+        if (matches_screen->line_focused_index > matches_screen->screen_items_count - 1)
+        {
+            matches_screen->line_focused_index = matches_screen->screen_items_count - 1;
+        }
+        else if (matches_screen->line_focused_index < 0)
+        {
+            matches_screen->line_focused_index = 0;
+        }
+    }
+    else if (all_matched_items_count > screen_matched_item_count)
+    {
+
+        int current_index = matches_screen->line_focused_index;
+        int current_position = matches_screen->first_displayed_match_index;
+        int max_first_displayed = all_matched_items_count - matches_screen->screen_items_count;
+
+        bool is_inside_list = current_position + current_index + movement_positions <= all_matched_items_count &&
+            current_position + current_index + movement_positions >= 0;
+
+        matches_screen->line_focused_index += movement_positions;
+
+        if (matches_screen->line_focused_index > matches_screen->screen_items_count - 1)
+        {
+            matches_screen->first_displayed_match_index += movement_positions;
+
+            if (is_inside_list) {
+                matches_screen->line_focused_index = current_index;
+            } else {
+                matches_screen->line_focused_index = matches_screen->screen_items_count - 1;
+            }
+        }
+        else if (matches_screen->line_focused_index < 0)
+        {
+            matches_screen->first_displayed_match_index += movement_positions;
+
+            if (is_inside_list) {
+                matches_screen->line_focused_index = current_index;
+            } else {
+                matches_screen->line_focused_index = 0;
+            }
+        }
+
+        int first_displayed_diff = matches_screen->first_displayed_match_index - max_first_displayed;
+
+        if (first_displayed_diff > 0)
+        {
+            if (matches_screen->line_focused_index + first_displayed_diff < matches_screen->screen_items_count) {
+                matches_screen->line_focused_index += first_displayed_diff;
+            }
+            matches_screen->first_displayed_match_index = max_first_displayed;
+        } else if (matches_screen->first_displayed_match_index < 0) {
+            if (matches_screen->line_focused_index + matches_screen->first_displayed_match_index >= 0) {
+                matches_screen->line_focused_index += matches_screen->first_displayed_match_index;
+            }
+            matches_screen->first_displayed_match_index = 0;
+        }
+
+        MatchItem * first_item = MatchItem_getItemN(all_matched_item, matches_screen->first_displayed_match_index);
+        matches_screen->screen_item = MatchItem_getNItems(first_item, matches_screen->screen_items_count);
+    }
+}
+
 void waitForKey(struct LoopOpts * opts)
 {
     struct MatchesListScreen * matches_screen = opts->matches_screen;
 
     int screen_matched_item_count = MatchItem_countList(
-        matches_screen->screen_item
-    );
+                                        matches_screen->screen_item
+                                    );
     int all_matched_items_count = MatchItem_countList(opts->all_matched_item);
 
     int items_position = 0;
@@ -143,47 +231,39 @@ void waitForKey(struct LoopOpts * opts)
         // use a variable to increment or decrement the value based on the input.
         if (ch == KEY_UP)
         {
-            matches_screen->line_focused_index -= 1;
-            if (matches_screen->line_focused_index < 0)
-            {
-                matches_screen->line_focused_index = 0;
-                if (items_position > 0)
-                {
-                    moveScreenItems(opts, items_position, -1);
-                    items_position--;
-                    updateScreenItems(opts);
-                }
-            }
+            tryMovingSelectedLine(
+                opts->all_matched_item,
+                matches_screen,
+                -1
+            );
+            updateScreenItems(opts);
         }
         else if (ch == KEY_DOWN)
         {
-            matches_screen->line_focused_index += 1;
-
-            if (matches_screen->line_focused_index > screen_matched_item_count - 1)
-            {
-                matches_screen->line_focused_index = screen_matched_item_count - 1;
-
-                if (screen_matched_item_count < all_matched_items_count)
-                {
-                    moveScreenItems(opts, items_position, 1);
-                    items_position++;
-                    updateScreenItems(opts);
-                }
-            }
+            tryMovingSelectedLine(
+                opts->all_matched_item,
+                matches_screen,
+                1
+            );
+            updateScreenItems(opts);
         }
         else if (ch == KEY_PPAGE)
         {
-            if (screen_matched_item_count == all_matched_items_count)
-            {
-                matches_screen->line_focused_index = 0;
-            }
+            tryMovingSelectedLine(
+                opts->all_matched_item,
+                matches_screen,
+                screen_matched_item_count * -1
+            );
+            updateScreenItems(opts);
         }
         else if (ch == KEY_NPAGE)
         {
-            if (screen_matched_item_count == all_matched_items_count)
-            {
-                matches_screen->line_focused_index = screen_matched_item_count - 1;
-            }
+            tryMovingSelectedLine(
+                opts->all_matched_item,
+                matches_screen,
+                screen_matched_item_count
+            );
+            updateScreenItems(opts);
         }
         else if (ch == KEY_ENTER_FIXED)
         {
@@ -220,7 +300,7 @@ void UI_listMatches(MatchItem * all_matched_item)
     matches_screen.screen_item = screen_matched_item;
     matches_screen.first_displayed_match_index = 0;
     matches_screen.line_focused_index = 0;
-    matches_screen.sceen_items_count = MatchItem_countList(matches_screen.screen_item);
+    matches_screen.screen_items_count = MatchItem_countList(matches_screen.screen_item);
 
     struct LoopOpts opts = {&matches_screen, all_matched_item, w};
 
