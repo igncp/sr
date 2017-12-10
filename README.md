@@ -29,9 +29,9 @@ The initial project was written in JS, but the performance was not great when se
 
 As a JS developer, the implementation was easier in JS, but C gives a better UX due to the greater speed
 
-With the C implementation the results appear in less than 1 second even for huge volumes (e.g. ~500k lines), compared to JS where it would take more than 25s
+With the C implementation the results appear in less than 1 second even for huge volumes (e.g. ~500k lines), compared to JS where it would take more than 25 seconds
 
-In JS everything was already async, except the display of the results screen, where you can select which to change
+In JS everything was already handled asynchronous (files reading, searching), except the display of the results screen, where you can select which matches to change
 
 A possible solution for JS was to load the results in the screen incrementally
 
