@@ -2,11 +2,15 @@
 
 Search and replace for the command line
 
-**This project is in active development**
+**This project is under active development**
 
-The initial project was written in JS, but it was not very performant for many files
+The initial project was written in JS, but the performance was not great when searching in many files
 
-[You can find the JS in another branch](https://github.com/igncp/sr/tree/js)
+As a JS developer, the implementation was easier in JS, but C gives a better UX due to the greater speed
+
+With the C implementation (not finished) the results appear in less than 1 second even for medium size projects (~50k lines)
+
+[You can find the JS project in another branch](https://github.com/igncp/sr/tree/js)
 
 ## Install
 
