@@ -3,7 +3,7 @@
 
 #include "search.h"
 
-int getstrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
+int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
     int reti;
     char msgbuf[100];
     regmatch_t matches[2];
@@ -69,5 +69,5 @@ int getFileContentRegexMatchesNumber(char * file_path, regex_t * compiled_regex)
 
     fclose(input_file);
 
-    return getstrRegexMatchesNumber(file_contents, compiled_regex);
+    return getStrRegexMatchesNumber(file_contents, compiled_regex);
 }
