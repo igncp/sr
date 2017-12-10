@@ -14,9 +14,9 @@ int main(void)
 
     if (number_failed > 0) {
         puts("__FAILED__");
+
+        return EXIT_FAILURE;
     }
 
-    return (number_failed == 0)
-        ? EXIT_SUCCESS
-        : EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
