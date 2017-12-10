@@ -6,12 +6,14 @@ None.
 
 ## Refactors
 
-None.
+- Decouple screen movement from matches list, to use it in the preview screen
 
 ## Features
 
-- Support PageUp and PageDown in the UI list
+- Replace match on enter
+  - This will require to update the matches for that file
+- Add preview window
 
 ## Infrastructure
 
-None.
+- Setup Travis
