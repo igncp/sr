@@ -9,15 +9,15 @@ typedef struct MatchItem
     size_t total;
 } MatchItem;
 
-int MatchItem_countList(MatchItem * initial_node);
+int MatchItem_countList(MatchItem*);
 
 void MatchItem_copyDataToFrom(MatchItem * dest, MatchItem * src);
-void MatchItem_deleteList(MatchItem * item);
+void MatchItem_deleteList(MatchItem*);
 
-MatchItem * MatchItem_getItemN(MatchItem * initial_node, int n);
-MatchItem * MatchItem_getLast(MatchItem * initial_node);
-MatchItem * MatchItem_getNItems(MatchItem * item, int n);
-MatchItem * MatchItem_copySingle(MatchItem * item);
-MatchItem * MatchItem_moveFirstToEnd(MatchItem * item);
+MatchItem * MatchItem_getItemN(MatchItem*, int n);
+MatchItem * MatchItem_getLast(MatchItem*);
+MatchItem * MatchItem_getNItems(MatchItem*, int n);
+MatchItem * MatchItem_copySingle(MatchItem*);
+MatchItem * MatchItem_moveFirstToEnd(MatchItem*);
 
 #endif

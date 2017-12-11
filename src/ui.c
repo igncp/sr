@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "match_item.h"
+#include "scrollable_list.h"
 
 #define KEY_ENTER_FIXED 10
 
@@ -294,6 +295,30 @@ void UI_listMatches(MatchItem * all_matched_item)
 
     MatchItem * screen_matched_item = getScreenItemsFromMatchItem(all_matched_item);
 
+    MatchItem * node = all_matched_item;
+    ScrollableListItem * scrollable_list_items = NULL;
+    while (true)
+    {
+        if (node == NULL)
+        {
+            break;
+        }
+
+        ScrollableListItem * r = malloc(sizeof(ScrollableListItem));
+        r->text = "foo";
+        r->next = NULL;
+
+        if (scrollable_list_items == NULL) {
+            scrollable_list_items = r;
+        } else {
+            ScrollableListItem_getLast(scrollable_list_items)->next = r;
+        }
+
+        node = node->next;
+    }
+
+    ScrollableList scrollable_list = ScrollableList_create(scrollable_list_items, w);
+
     struct MatchesListScreen matches_screen;
 
     matches_screen.screen_item = screen_matched_item;
@@ -304,7 +329,7 @@ void UI_listMatches(MatchItem * all_matched_item)
     struct LoopOpts opts = {&matches_screen, all_matched_item, w};
 
     int i = 0;
-    MatchItem * node = screen_matched_item;
+    node = screen_matched_item;
     while (true)
     {
         if (node == NULL)
