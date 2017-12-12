@@ -1,6 +1,8 @@
 #ifndef MATCH_ITEM_H
 #define MATCH_ITEM_H
 
+#include <stddef.h>
+
 typedef struct MatchItem
 {
     char * path;

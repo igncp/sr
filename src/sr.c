@@ -5,7 +5,7 @@
 #include "file_item.h"
 #include "match_item.h"
 #include "search.h"
-#include "ui.h"
+#include "matches_ui.h"
 
 typedef struct ParsedOpts
 {
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
     FileItem_deleteList(normal_file_item);
 
-    UI_listMatches(matched_file);
+    MatchesUI_listMatches(matched_file);
 
     return(EXIT_SUCCESS);
 }
