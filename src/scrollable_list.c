@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "scrollable_list.h"
@@ -160,6 +161,23 @@ void ScrollableList_refreshList(ScrollableList * scrollable_list) {
     }
 }
 
+void ScrollableList_paintRowText(int line_index, const char * text, WINDOW * window) {
+    char item[1024];
+
+    sprintf(
+        item,
+        "%s",
+        text
+    );
+
+    int text_len = COLS - 4 - strlen(text);
+    for (int i = 0; i < text_len; i++) {
+        strcat(item, " ");
+    }
+
+    mvwprintw(window, line_index+1, 2, "%s", item);
+}
+
 ScrollableList ScrollableList_create(ScrollableListItem * all_items, WINDOW * window) {
     ScrollableList scrollable_list;
 
@@ -187,7 +205,7 @@ ScrollableList ScrollableList_create(ScrollableListItem * all_items, WINDOW * wi
         else
             wattroff( window, A_STANDOUT );
 
-        mvwprintw(window, i + 1, 2, "%s", node->text);
+        ScrollableList_paintRowText(i, node->text, window);
 
         node = node->next;
         i++;
@@ -276,7 +294,6 @@ void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int 
 }
 
 void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index) {
-    char item[1024];
     ScrollableListItem * node = ScrollableListItem_getItemN(scrollable_list->displayed_items, line_index);
 
     if(line_index == scrollable_list->selected_line_index)
@@ -284,38 +301,20 @@ void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index) {
     else
         wattroff(scrollable_list->window, A_STANDOUT);
 
-    sprintf(
-        item,
-        "%s",
-        node->text
+    ScrollableList_paintRowText(
+        line_index,
+        node->text,
+        scrollable_list->window
     );
-    mvwprintw(scrollable_list->window, line_index+1, 2, "%s", item);
 
     wattroff(scrollable_list->window, A_STANDOUT);
 }
 
 void ScrollableList_paintScreenItems(ScrollableList * scrollable_list) {
     ScrollableListItem * node = scrollable_list->displayed_items;
+    int displayed_items_count = ScrollableListItem_getCount(node);
     int i = 0;
-    char item[1024];
 
-    i = 0;
-    while (true)
-    {
-        if (i == ScrollableList_getScreenMaxDisplayedLines())
-        {
-            break;
-        }
-
-        sprintf(item, "%*s", COLS - 4, "");
-        mvwprintw(scrollable_list->window, i+1, 2, "%s", item);
-        wnoutrefresh(scrollable_list->window);
-        i++;
-    }
-
-    doupdate();
-
-    i = 0;
     while (true)
     {
         if (node == NULL)
@@ -324,12 +323,22 @@ void ScrollableList_paintScreenItems(ScrollableList * scrollable_list) {
         }
 
         ScrollableList_paintRow(scrollable_list, i);
+        wrefresh(scrollable_list->window);
 
         node = node->next;
         i++;
     }
 
-    wrefresh(scrollable_list->window);
+    int max_displayed_lines = ScrollableList_getScreenMaxDisplayedLines();
+    if (displayed_items_count < max_displayed_lines) {
+        for(i = displayed_items_count; i < max_displayed_lines; i++) {
+            ScrollableList_paintRowText(
+                i,
+                " ",
+                scrollable_list->window
+            );
+        }
+    }
 }
 
 void ScrollableList_handleEnter(ScrollableList * scrollable_list) {
