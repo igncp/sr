@@ -2,10 +2,12 @@
 #include <stdlib.h>
 
 #include "search.h"
+#include "file_io.h"
 
 int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
     int reti;
     char msgbuf[100];
+    char * orig_str = str;
     regmatch_t matches[2];
     int end;
 
@@ -27,16 +29,21 @@ int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
             }
         }
 
+        free(orig_str);
+
         return count;
     }
     else if (reti == REG_NOMATCH)
     {
+        free(orig_str);
+
         return 0;
     }
     else
     {
         regerror(reti, compiled_regex, msgbuf, sizeof(msgbuf));
         fprintf(stderr, "Regex match failed: %s\n", msgbuf);
+        free(orig_str);
 
         exit(1);
     }
@@ -57,17 +64,7 @@ regex_t * getCompiledRegex(char * regex_str) {
 }
 
 int getFileContentRegexMatchesNumber(char * file_path, regex_t * compiled_regex) {
-    char *file_contents;
-    long input_file_size;
-    FILE *input_file = fopen(file_path, "rb");
+    char * file_content = FileIO_getFileContent(file_path);
 
-    fseek(input_file, 0, SEEK_END);
-    input_file_size = ftell(input_file);
-    rewind(input_file);
-    file_contents = malloc(input_file_size * (sizeof(char)));
-    fread(file_contents, sizeof(char), input_file_size, input_file);
-
-    fclose(input_file);
-
-    return getStrRegexMatchesNumber(file_contents, compiled_regex);
+    return getStrRegexMatchesNumber(file_content, compiled_regex);
 }

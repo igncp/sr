@@ -2,13 +2,35 @@
 
 #include <curses.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "match_item.h"
 #include "scrollable_list.h"
+#include "file_io.h"
 
 static MatchItem * g_all_matched_items;
+static ScrollableList * g_preview_list;
 
-ScrollableListItem * MatchesUI_getAllListItems(void) {
+char* strtoke(char *str, const char *delim)
+{
+  static char *start = NULL;
+  char *token = 0;
+
+  if (str)
+      start = str;
+  if (!start)
+      return NULL;
+
+  token = start;
+  start = strpbrk(start, delim);
+
+  if (start)
+      *start++ = '\0';
+
+  return token;
+}
+
+ScrollableListItem * MatchesUI_getAllMatchesListItems(void) {
     MatchItem * node = g_all_matched_items;
     ScrollableListItem * scrollable_list_items = NULL;
 
@@ -37,7 +59,49 @@ ScrollableListItem * MatchesUI_getAllListItems(void) {
     return scrollable_list_items;
 }
 
-void MatchesUI_handleEnter(ScrollableList * scrollable_list, int absolute_index) {
+ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index) {
+    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_selected_index);
+    char * file_content = FileIO_getFileContent(item->path);
+
+    ScrollableListItem * scrollable_list_items = NULL;
+
+    char * pch;
+    pch = strtoke(file_content, "\n");
+    while (true)
+    {
+        if (pch == NULL) {
+            break;
+        }
+
+        ScrollableListItem * r = malloc(sizeof(ScrollableListItem));
+
+        r->text = malloc(sizeof(char) * strlen(pch) + 1);
+        sprintf(r->text, "%s", pch);
+        r->next = NULL;
+
+        if (scrollable_list_items == NULL) {
+            scrollable_list_items = r;
+        } else {
+            ScrollableListItem_getLast(scrollable_list_items)->next = r;
+        }
+
+        pch = strtoke(NULL, "\n");
+    }
+
+    return scrollable_list_items;
+}
+
+void MatchesUI_handleMatchesListMove(int absolute_selected_index) {
+    ScrollableListItem_destroyItems(g_preview_list->all_items);
+
+    ScrollableListItem * preview_items = MatchesUI_getPreviewListItems(absolute_selected_index);
+
+    g_preview_list->all_items = preview_items;
+
+    ScrollableList_refreshAndPaintList(g_preview_list);
+}
+
+void MatchesUI_handleMatchesListEnter(ScrollableList * scrollable_list, int absolute_index) {
     MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_index);
     int all_matched_items_count = MatchItem_countList(g_all_matched_items);
 
@@ -61,27 +125,48 @@ void MatchesUI_handleEnter(ScrollableList * scrollable_list, int absolute_index)
 
     ScrollableListItem_destroyItems(scrollable_list->all_items);
 
-    scrollable_list->all_items = MatchesUI_getAllListItems();
+    int items_count = MatchItem_countList(g_all_matched_items);
+
+    if (items_count == 0) {
+        scrollable_list->all_items = NULL;
+
+        return;
+    }
+
+    scrollable_list->all_items = MatchesUI_getAllMatchesListItems();
+
+    ScrollableList_refreshAndPaintList(scrollable_list);
+
+    MatchesUI_handleMatchesListMove(scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index);
 }
 
 void MatchesUI_listMatches(MatchItem * all_matched_item)
 {
-    WINDOW * window;
-
     g_all_matched_items = all_matched_item;
 
     initscr();
-    window = newwin(LINES - 1, COLS - 1, 1, 1);
-    box(window, 0, 0);
 
-    ScrollableListItem * scrollable_list_items = MatchesUI_getAllListItems();
+    ScrollableListItem * matches_scrollable_list_items = MatchesUI_getAllMatchesListItems();
+    ScrollableListItem * preview_list_items = MatchesUI_getPreviewListItems(0);
 
-    ScrollableList scrollable_list = ScrollableList_create(scrollable_list_items, window);
+    long total_width = COLS - 1;
+    long list_width = total_width / 2 - 1;
 
-    scrollable_list.onEnter = &MatchesUI_handleEnter;
+    WINDOW * matches_window = newwin(LINES - 1, list_width, 1, 1);
+    WINDOW * preview_window = newwin(LINES - 1, list_width, 1, list_width + 1);
+
+    ScrollableList scrollable_list = ScrollableList_create(matches_scrollable_list_items, matches_window, list_width, true);
+    ScrollableList preview_list = ScrollableList_create(preview_list_items, preview_window, list_width, false);
+
+    g_preview_list = &preview_list;
+
+    scrollable_list.onEnter = &MatchesUI_handleMatchesListEnter;
+    scrollable_list.onMove = &MatchesUI_handleMatchesListMove;
 
     ScrollableList_waitForKey(&scrollable_list);
 
-    delwin(window);
+    delwin(matches_window);
+    delwin(preview_window);
+
     endwin();
 }

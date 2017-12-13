@@ -43,7 +43,7 @@ FileItem * FileItem_getFilesList(char *name)
         // if it is a file
         if (access(name, F_OK ) != -1)
         {
-            char * path = malloc(sizeof(used_name));
+            char * path = malloc(sizeof(char) * strlen(used_name));
 
             strcpy(path, used_name);
 

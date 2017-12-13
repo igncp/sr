@@ -2,17 +2,21 @@
 
 ## Issues
 
-- Handle long file names
+- Clean better occasional characters in preview window
+- When preview very big files, program freezes, add guard for big files.
 
 ## Refactors
 
-- Decouple screen movement from matches list, to use it in the preview screen
+None.
 
 ## Features
 
 - Replace match on enter
-  - This will require to update the matches for that file
-- Add preview window
+- Add header
+- Highlight replacement
+- Focus on replacement
+- Add case insensitive opts
+- Add word delimiters opts
 
 ## Infrastructure
 
