@@ -2,17 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common_types.h"
 #include "file_item.h"
 #include "match_item.h"
 #include "search.h"
 #include "matches_ui.h"
-
-typedef struct ParsedOpts
-{
-    char * searchPath;
-    char * searchPattern;
-    char * searchReplacement;
-} ParsedOpts;
 
 void printHelp(void)
 {
@@ -96,7 +90,7 @@ int main(int argc, char *argv[])
 
     FileItem_deleteList(normal_file_item);
 
-    MatchesUI_listMatches(matched_file);
+    MatchesUI_listMatches(parsed_opts, matched_file);
 
     return(EXIT_SUCCESS);
 }
