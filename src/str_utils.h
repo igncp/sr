@@ -11,6 +11,7 @@ struct StrUtils_Line {
 struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines);
 void StrUtils_Line_destroyList(struct StrUtils_Line*);
 int StrUtils_getDigitsForNumber(int number);
+char * StrUtils_createStrWithFragmentReplaced(char * orig_str, int pos_start, int chars, char * replacement);
 
 // LinkedListType requirements: next and char * text
 #define STR_UTILS_ADD_LINE_NUMBERS(LinkedListType, LinkedList_Ptr, IntCount) \

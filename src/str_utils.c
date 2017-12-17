@@ -102,3 +102,29 @@ void StrUtils_Line_destroyList(struct StrUtils_Line * line) {
         free(node_to_free);
     }
 }
+
+char * StrUtils_createStrWithFragmentReplaced(char * orig_str, int pos_start, int chars, char * replacement) {
+    int final_str_len = sizeof(char) * (strlen(orig_str) - chars + strlen(replacement)) + 1;
+    int suffix_len = strlen(orig_str) - chars - pos_start;
+
+    char * final_str = malloc(final_str_len);
+
+    strncpy(final_str, orig_str, pos_start);
+    final_str[pos_start] = 0;
+    strcat(final_str, replacement);
+
+    if (suffix_len > 0) {
+        char suffix[suffix_len];
+        strncpy(
+            suffix,
+            orig_str + pos_start + chars,
+            strlen(orig_str) - chars - pos_start
+        );
+        suffix[suffix_len] = 0;
+        strcat(final_str, suffix);
+    }
+
+    final_str[final_str_len - 1] = 0;
+
+    return final_str;
+}

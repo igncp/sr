@@ -15,6 +15,7 @@ static MatchItem * g_all_matched_items;
 static ScrollableList * g_preview_list;
 static ScrollableList * g_header_list;
 static char * g_search_pattern;
+static char * g_search_replacement;
 const char * too_many_lines_text = "... [sr: TOO MANY LINES] ...";
 
 ScrollableListItem * MatchesUI_getAllMatchesListItems(void) {
@@ -59,13 +60,15 @@ ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index) 
 
     char * file_content = FileIO_getFileContent(item->path);
 
-    int match_position = getPositionInStrOfRegexMatchIdx(
+    struct Search_RegexPositions match_position = getPositionsInStrOfRegexMatchIdx(
         file_content,
         g_search_pattern,
         item->index
-    ) + 1;
+    );
     ScrollableListItem * scrollable_list_items = NULL;
     ScrollableListItem * last = NULL;
+
+    match_position.start += 1;
 
     struct StrUtils_Line * lines = StrUtils_Line_splitStrInLines(
         file_content,
@@ -85,10 +88,9 @@ ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index) 
             break;
         }
 
-
         text_len_covered += strlen(node->text) + 1;
 
-        if (text_len_covered < match_position) {
+        if (text_len_covered < match_position.start) {
             match_line_index += 1;
             pos_at_match_line += strlen(node->text) + 1;
         }
@@ -130,9 +132,27 @@ ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index) 
             g_preview_list->selected_line_index = half_displayed_screen - 2;
         }
 
-        int digits_for_total = StrUtils_getDigitsForNumber(items_count);
-        g_preview_list->selection_line_start_pos = match_position - pos_at_match_line + digits_for_total + 1;
-        g_preview_list->selection_line_end_pos = g_preview_list->selection_line_start_pos + 1;
+        ScrollableListItem * highligted_line = ScrollableListItem_getItemN(scrollable_list_items, match_line_index);
+
+        if (highligted_line != NULL) {
+            int digits_for_total = StrUtils_getDigitsForNumber(items_count);
+            int start_of_replacement = match_position.start - pos_at_match_line + digits_for_total;
+            char * text_to_free = highligted_line->text;
+
+            char * new_line_content = StrUtils_createStrWithFragmentReplaced(
+                highligted_line->text,
+                start_of_replacement,
+                match_position.end_relative,
+                g_search_replacement
+            );
+
+            highligted_line->text = new_line_content;
+
+            free(text_to_free);
+
+            g_preview_list->selection_line_start_pos = start_of_replacement + 1;
+            g_preview_list->selection_line_end_pos = g_preview_list->selection_line_start_pos + strlen(g_search_replacement);
+        }
     } else {
         char * too_many_lines_ptr = malloc(sizeof(char) * strlen(too_many_lines_text) + 1);
         strcpy(too_many_lines_ptr, too_many_lines_text);
@@ -260,6 +280,7 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
     }
 
     g_search_pattern = parsed_opts->searchPattern;
+    g_search_replacement = parsed_opts->searchReplacement;
     g_all_matched_items = all_matched_item;
 
     initscr();
