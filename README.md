@@ -20,7 +20,7 @@ make && \
 To run the tests:
 ```
 cd tests
-make && ../build/test/test_result`
+make && ../build/test/test_result
 ```
 
 ## Background
