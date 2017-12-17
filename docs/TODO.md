@@ -2,8 +2,7 @@
 
 ## Issues
 
-- Errors in Valngrid
-- Scrolling breaks due to core dumped
+- In some cases (~ 1/20) the selected text does not match the replacement
 
 ## Refactors
 
@@ -12,9 +11,6 @@ None.
 ## Features
 
 - Replace match on enter
-- Add header
-- Highlight replacement
-- Focus on replacement
 - Add case insensitive opts
 - Add word delimiters opts
 - Versioning
