@@ -151,6 +151,7 @@ void FileItem_deleteList(FileItem * file_item)
 
         node = node->next;
 
+        free(old_node->path);
         free(old_node);
     }
 }

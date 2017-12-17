@@ -161,6 +161,7 @@ void MatchItem_deleteList(MatchItem * item)
 
         node = node->next;
 
+        free(old_node->path);
         free(old_node);
     }
 }

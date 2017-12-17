@@ -2,8 +2,8 @@
 
 ## Issues
 
-- Clean better occasional characters in preview window
-- When preview very big files, program freezes, add guard for big files.
+- Errors in Valngrid
+- Scrolling breaks due to core dumped
 
 ## Refactors
 
@@ -17,7 +17,8 @@ None.
 - Focus on replacement
 - Add case insensitive opts
 - Add word delimiters opts
+- Versioning
 
 ## Infrastructure
 
-- Setup Travis
+- Setup Travis to: build, run tests and valgrind

@@ -4,6 +4,7 @@ default:
 	@mkdir -p build/bin
 	@gcc \
 		-g \
+		-O \
 		${SRC_FILES} \
 		-Wall -Wextra -Wpedantic \
 		-Wformat=2 -Wno-unused-parameter -Wshadow \

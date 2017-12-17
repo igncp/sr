@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common_types.h"
 #include "file_item.h"
@@ -52,8 +53,9 @@ MatchItem * getRegexMatchesFromFiles(FileItem * file_item, char * regex_str)
             for (int i = numberOfMatches - 1; i >= 0; i--)
             {
                 MatchItem * r = malloc(sizeof(MatchItem));
+                r->path = malloc(sizeof(char) * strlen(node->path) + 1);
 
-                r->path = node->path;
+                strcpy(r->path, node->path);
                 r->total = numberOfMatches;
                 r->index = i;
 
@@ -75,6 +77,9 @@ MatchItem * getRegexMatchesFromFiles(FileItem * file_item, char * regex_str)
         node = node->next;
     }
 
+    regfree(compiled_regex);
+    free(compiled_regex);
+
     // due to the ordering, the first one should be move to the end
     matching_file = MatchItem_moveFirstToEnd(matching_file);
 
@@ -91,6 +96,8 @@ int main(int argc, char *argv[])
     FileItem_deleteList(normal_file_item);
 
     MatchesUI_listMatches(parsed_opts, matched_file);
+
+    free(parsed_opts);
 
     return(EXIT_SUCCESS);
 }
