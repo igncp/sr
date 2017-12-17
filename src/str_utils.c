@@ -1,16 +1,9 @@
 #include "str_utils.h"
 
-#include "matches_ui.h"
-
-#include <curses.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "common_types.h"
-#include "match_item.h"
-#include "scrollable_list.h"
-#include "file_io.h"
-#include "search.h"
 
 char* strtoke(char *str, const char *delim)
 {
