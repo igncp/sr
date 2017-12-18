@@ -7,7 +7,7 @@
 #include "match_item.h"
 #include "matches_ui.h"
 
-#define VERSION "0.0.1"
+#define VERSION "0.1.0"
 
 void printVersion(void)
 {
