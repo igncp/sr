@@ -3,6 +3,7 @@
 ## Issues
 
 - In some cases (~ 1/20) the selected text does not match the replacement
+- Core Dump in rare cases when scrolling down long lists (> 10.000 matches)
 
 ## Refactors
 
@@ -10,10 +11,7 @@ None.
 
 ## Features
 
-- Replace match on enter
 - Add case insensitive opts
-- Add word delimiters opts
-- Versioning
 
 ## Infrastructure
 

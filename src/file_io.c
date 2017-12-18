@@ -20,3 +20,13 @@ char * FileIO_getFileContent(char * file_path) {
 
     return file_contents;
 }
+
+void FileIO_setFileContent(char * file_path, char * file_content) {
+    FILE * fp;
+
+    fp = fopen(file_path, "w+");
+
+    fputs(file_content, fp);
+
+    fclose(fp);
+}

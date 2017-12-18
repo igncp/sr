@@ -13,11 +13,11 @@ If you want to try it, you will need to install ncurses. Currently it is only te
 To run the binary:
 
 ```
-make && \
-./build/bin/sr
+make && ./build/bin/sr
 ```
 
 To run the tests:
+
 ```
 cd tests
 make && ../build/test/test_result

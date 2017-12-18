@@ -4,13 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common_types.h"
 #include "match_item.h"
 #include "scrollable_list.h"
 #include "file_io.h"
+#include "file_item.h"
 #include "str_utils.h"
 #include "search.h"
 
+#include <unistd.h> // @TODO remove
 static MatchItem * g_all_matched_items;
 static ScrollableList * g_preview_list;
 static ScrollableList * g_header_list;
@@ -237,26 +238,119 @@ void MatchesUI_handleMatchesListMove(int absolute_selected_index) {
     MatchesUI_updatePreviewList(absolute_selected_index);
 }
 
-void MatchesUI_handleMatchesListEnter(ScrollableList * scrollable_list, int absolute_index) {
-    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_index);
-    int all_matched_items_count = MatchItem_countList(g_all_matched_items);
+void MatchesUI_replaceMatchIndexInFile(int absolute_selected_index) {
+    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_selected_index);
 
-    if (absolute_index == 0) {
-        g_all_matched_items = item->next;
-    } else {
-        MatchItem * r = MatchItem_getItemN(g_all_matched_items, absolute_index - 1);
-
-        if (absolute_index == all_matched_items_count - 1) {
-            r->next = NULL;
-        } else {
-            r->next = r->next->next;
-        }
+    if (item == NULL) {
+        return;
     }
 
-    item->next = NULL;
-    MatchItem_deleteList(item);
+    char * file_content = FileIO_getFileContent(item->path);
+
+    struct Search_RegexPositions match_position = getPositionsInStrOfRegexMatchIdx(
+        file_content,
+        g_search_pattern,
+        item->index
+    );
+
+    char * new_file_content = StrUtils_createStrWithFragmentReplaced(
+        file_content,
+        match_position.start,
+        match_position.end_relative,
+        g_search_replacement
+    );
+
+    free(file_content);
+
+    FileIO_setFileContent(item->path, new_file_content);
+
+    free(new_file_content);
+}
+
+void MatchesUI_updateMatchesForFile(char * file_path) {
+    MatchItem * first_node_not_of_path = NULL;
+    MatchItem * first_node_prev_of_path = NULL;
+    MatchItem * items_of_path = NULL;
+    MatchItem * items_of_path_last = NULL;
+
+    MatchItem * node = g_all_matched_items;
+    MatchItem * node_prev = NULL;
+
+    while (true) {
+        if (node == NULL) {
+            break;
+        }
+
+        MatchItem * next_node = node->next;
+
+        if (strcmp(node->path, file_path) == 0) {
+            if (node_prev != NULL) {
+                node_prev->next = NULL;
+            }
+
+            node->next = NULL;
+
+            if (items_of_path == NULL) {
+                first_node_prev_of_path = node_prev;
+                items_of_path = node;
+            } else {
+                items_of_path_last->next = node;
+            }
+
+            items_of_path_last = node;
+        } else {
+            if (node_prev != NULL) {
+                node_prev->next = node;
+            }
+
+            if (first_node_not_of_path == NULL) {
+                first_node_not_of_path = node;
+            }
+
+            node_prev = node;
+        }
+
+        node = next_node;
+    }
+
+    MatchItem_deleteList(items_of_path);
+
+    g_all_matched_items = first_node_not_of_path;
+
+    FileItem file_item = {
+        .path = file_path,
+        .next = NULL
+    };
+
+    MatchItem * new_path_items = getRegexMatchesFromFiles(&file_item, g_search_pattern);
+
+    if (new_path_items == NULL) {
+        return;
+    }
+
+    if (first_node_prev_of_path == NULL) {
+        MatchItem_getLast(new_path_items)->next = g_all_matched_items;
+        g_all_matched_items = new_path_items;
+    } else {
+        MatchItem * next = first_node_prev_of_path->next;
+        first_node_prev_of_path->next = new_path_items;
+        MatchItem_getLast(new_path_items)->next = next;
+    }
+}
+
+void MatchesUI_handleMatchesListEnter(ScrollableList * scrollable_list, int absolute_index) {
+    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_index);
+
+    char * path = malloc(sizeof(char) * strlen(item->path) + 1);
+    strcpy(path, item->path);
+
+    MatchesUI_replaceMatchIndexInFile(absolute_index);
 
     ScrollableListItem_destroyItems(scrollable_list->all_items);
+
+    MatchesUI_updateMatchesForFile(path);
+
+    free(path);
 
     int items_count = MatchItem_countList(g_all_matched_items);
 
@@ -290,18 +384,20 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
     long total_width = COLS - 1;
     long total_height = LINES;
 
+#define MAIN_LISTS_DIFF_WIDTH 20
     long header_height = 7;
-    long list_width = total_width / 2;
+    long matches_list_width = total_width / 2 - MAIN_LISTS_DIFF_WIDTH;
+    long preview_list_witdh = matches_list_width + MAIN_LISTS_DIFF_WIDTH * 2;
     long list_height = total_height - header_height - 1;
 
-    WINDOW * matches_window = newwin(list_height, list_width, total_height - list_height, 1);
-    WINDOW * preview_window = newwin(list_height, list_width, total_height - list_height, list_width + 1);
+    WINDOW * matches_window = newwin(list_height, matches_list_width, total_height - list_height, 1);
+    WINDOW * preview_window = newwin(list_height, preview_list_witdh, total_height - list_height, matches_list_width + 1);
 
     ScrollableList matches_list =
         ScrollableList_create((struct ScrollableListCreateOpts){
             .all_items = matches_scrollable_list_items,
             .list_height = list_height,
-            .list_width = list_width,
+            .list_width = matches_list_width,
             .selection_mode = ScrollableList_SelectionMode_FullLine,
             .should_center_text = false,
             .window = matches_window,
@@ -310,7 +406,7 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
         ScrollableList_create((struct ScrollableListCreateOpts){
             .all_items = NULL,
             .list_height = list_height,
-            .list_width = list_width,
+            .list_width = preview_list_witdh,
             .selection_mode = ScrollableList_SelectionMode_LineFragment,
             .should_center_text = false,
             .window = preview_window,
