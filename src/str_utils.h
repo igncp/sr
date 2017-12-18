@@ -3,9 +3,10 @@
 
 #include <string.h>
 
-struct StrUtils_Line {
-  char * text;
-  struct StrUtils_Line * next;
+struct StrUtils_Line
+{
+    char * text;
+    struct StrUtils_Line * next;
 };
 
 struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines);

@@ -1,0 +1,12 @@
+{
+  "name": "sr",
+  "description": "Search and replace for the command line.",
+  "private": true,
+  "scripts": {
+    "precommit": "helpers/git-hooks/pre-commit.sh",
+    "prepush": "helpers/git-hooks/pre-push.sh"
+  },
+  "devDependencies": {
+    "husky": "^0.14.3"
+  }
+}

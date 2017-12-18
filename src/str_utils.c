@@ -7,24 +7,25 @@
 
 char* strtoke(char *str, const char *delim)
 {
-  static char *start = NULL;
-  char *token = 0;
+    static char *start = NULL;
+    char *token = 0;
 
-  if (str)
-      start = str;
-  if (!start)
-      return NULL;
+    if (str)
+        start = str;
+    if (!start)
+        return NULL;
 
-  token = start;
-  start = strpbrk(start, delim);
+    token = start;
+    start = strpbrk(start, delim);
 
-  if (start)
-      *start++ = '\0';
+    if (start)
+        *start++ = '\0';
 
-  return token;
+    return token;
 }
 
-struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines) {
+struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines)
+{
     struct StrUtils_Line * lines = NULL;
     struct StrUtils_Line * last = NULL;
 
@@ -33,11 +34,13 @@ struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines) 
     pch = strtoke(str, "\n");
     while (true)
     {
-        if (pch == NULL) {
+        if (pch == NULL)
+        {
             break;
         }
 
-        if (counter == max_lines) {
+        if (counter == max_lines)
+        {
             break;
         }
 
@@ -47,10 +50,13 @@ struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines) 
         sprintf(r->text, "%s", pch);
         r->next = NULL;
 
-        if (lines == NULL) {
+        if (lines == NULL)
+        {
             lines = r;
             last = r;
-        } else {
+        }
+        else
+        {
             last->next = r;
             last = r;
         }
@@ -62,14 +68,17 @@ struct StrUtils_Line * StrUtils_Line_splitStrInLines(char * str, int max_lines) 
     return lines;
 }
 
-int StrUtils_getDigitsForNumber(int number) {
+int StrUtils_getDigitsForNumber(int number)
+{
     int digits = 1;
     double count_for_digits = number;
 
-    while (true) {
+    while (true)
+    {
         count_for_digits = count_for_digits / 10;
 
-        if (count_for_digits < 1) {
+        if (count_for_digits < 1)
+        {
             break;
         };
 
@@ -79,11 +88,14 @@ int StrUtils_getDigitsForNumber(int number) {
     return digits;
 }
 
-void StrUtils_Line_destroyList(struct StrUtils_Line * line) {
+void StrUtils_Line_destroyList(struct StrUtils_Line * line)
+{
     struct StrUtils_Line * node = line;
 
-    while (true) {
-        if (node == NULL) {
+    while (true)
+    {
+        if (node == NULL)
+        {
             break;
         }
 
@@ -96,7 +108,8 @@ void StrUtils_Line_destroyList(struct StrUtils_Line * line) {
     }
 }
 
-char * StrUtils_createStrWithFragmentReplaced(char * orig_str, int pos_start, int chars, char * replacement) {
+char * StrUtils_createStrWithFragmentReplaced(char * orig_str, int pos_start, int chars, char * replacement)
+{
     int final_str_len = sizeof(char) * (strlen(orig_str) - chars + strlen(replacement)) + 1;
     int suffix_len = strlen(orig_str) - chars - pos_start;
 
@@ -106,7 +119,8 @@ char * StrUtils_createStrWithFragmentReplaced(char * orig_str, int pos_start, in
     final_str[pos_start] = 0;
     strcat(final_str, replacement);
 
-    if (suffix_len > 0) {
+    if (suffix_len > 0)
+    {
         char suffix[suffix_len];
         strncpy(
             suffix,

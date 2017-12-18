@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char * FileIO_getFileContent(char * file_path) {
+char * FileIO_getFileContent(char * file_path)
+{
     long input_file_size;
     FILE *input_file = fopen(file_path, "rb");
 
@@ -21,7 +22,8 @@ char * FileIO_getFileContent(char * file_path) {
     return file_contents;
 }
 
-void FileIO_setFileContent(char * file_path, char * file_content) {
+void FileIO_setFileContent(char * file_path, char * file_content)
+{
     FILE * fp;
 
     fp = fopen(file_path, "w+");

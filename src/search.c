@@ -4,7 +4,8 @@
 #include "search.h"
 #include "file_io.h"
 
-int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
+int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex)
+{
     int reti;
     char msgbuf[100];
     char * orig_str = str;
@@ -17,15 +18,19 @@ int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
     {
         count = 1;
 
-        while(true) {
+        while(true)
+        {
             end = matches[0].rm_eo;
 
             str = str + end;
             reti = regexec(compiled_regex, str, 2, matches, 0);
 
-            if (reti) {
+            if (reti)
+            {
                 break;
-            } else {
+            }
+            else
+            {
                 count++;
             }
         }
@@ -42,7 +47,8 @@ int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex) {
     return count;
 }
 
-regex_t * getCompiledRegex(char * regex_str) {
+regex_t * getCompiledRegex(char * regex_str)
+{
     regex_t * regex = malloc(sizeof(regex_t));
 
     int reti = regcomp(regex, regex_str, REG_NEWLINE);
@@ -56,7 +62,8 @@ regex_t * getCompiledRegex(char * regex_str) {
     return regex;
 }
 
-struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(char * str, char * uncompiled_regex, int index) {
+struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(char * str, char * uncompiled_regex, int index)
+{
     regex_t * compiled_regex = getCompiledRegex(uncompiled_regex);
     struct Search_RegexPositions pos;
 
@@ -75,10 +82,12 @@ struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(char * str, char *
     {
         int count = 0;
 
-        while(true) {
+        while(true)
+        {
             pos.end_relative = matches[0].rm_eo - matches[0].rm_so;
 
-            if (count == index) {
+            if (count == index)
+            {
                 pos.start += matches[0].rm_so;
 
                 break;
@@ -91,9 +100,12 @@ struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(char * str, char *
 
             reti = regexec(compiled_regex, str, 2, matches, 0);
 
-            if (reti) {
+            if (reti)
+            {
                 break;
-            } else {
+            }
+            else
+            {
                 count++;
             }
         }
@@ -114,7 +126,8 @@ struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(char * str, char *
     return pos;
 }
 
-int getFileContentRegexMatchesNumber(char * file_path, regex_t * compiled_regex) {
+int getFileContentRegexMatchesNumber(char * file_path, regex_t * compiled_regex)
+{
     char * file_content = FileIO_getFileContent(file_path);
     int number = getStrRegexMatchesNumber(file_content, compiled_regex);
 

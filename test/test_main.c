@@ -12,7 +12,8 @@ int main(void)
     number_failed += test_FileItem_getFailed();
     number_failed += test_MatchItem_getFailed();
 
-    if (number_failed > 0) {
+    if (number_failed > 0)
+    {
         puts("__FAILED__");
 
         return EXIT_FAILURE;

@@ -6,9 +6,10 @@
 
 regex_t * getCompiledRegex(char * regex_str);
 
-struct Search_RegexPositions {
-  int start;
-  int end_relative;
+struct Search_RegexPositions
+{
+    int start;
+    int end_relative;
 };
 
 int getFileContentRegexMatchesNumber(char * file_path, regex_t * compiled_regex);

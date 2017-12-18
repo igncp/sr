@@ -37,7 +37,8 @@ Suite * test_FileItem_suite(void)
     return s;
 }
 
-int test_FileItem_getFailed() {
+int test_FileItem_getFailed()
+{
     int number_failed;
     SRunner *sr = srunner_create(test_FileItem_suite());
 

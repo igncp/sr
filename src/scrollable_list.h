@@ -4,7 +4,8 @@
 
 #include <curses.h>
 
-typedef struct ScrollableListItem {
+typedef struct ScrollableListItem
+{
     char * text;
     struct ScrollableListItem * next;
 } ScrollableListItem;
@@ -18,13 +19,15 @@ ScrollableListItem * ScrollableListItem_create(char * text);
 int ScrollableListItem_getCount(ScrollableListItem*);
 void ScrollableListItem_destroyItems(ScrollableListItem*);
 
-enum ScrollableList_SelectionMode {
-  ScrollableList_SelectionMode_FullLine,
-  ScrollableList_SelectionMode_LineFragment,
-  ScrollableList_SelectionMode_NoSelection,
+enum ScrollableList_SelectionMode
+{
+    ScrollableList_SelectionMode_FullLine,
+    ScrollableList_SelectionMode_LineFragment,
+    ScrollableList_SelectionMode_NoSelection,
 };
 
-typedef struct ScrollableList {
+typedef struct ScrollableList
+{
     ScrollableListItem * all_items;
     ScrollableListItem * displayed_items;
 
@@ -45,7 +48,8 @@ typedef struct ScrollableList {
     void (*onMove)(int absolute_selected_index);
 } ScrollableList;
 
-struct ScrollableListCreateOpts {
+struct ScrollableListCreateOpts
+{
     ScrollableListItem * all_items;
     WINDOW * window;
     bool should_center_text;

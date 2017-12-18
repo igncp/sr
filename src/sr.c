@@ -18,11 +18,13 @@ int main(int argc, char *argv[])
 {
     ParsedOpts * parsed_opts = parseOpts(argc, argv);
 
-    if (parsed_opts->exit_code != EXIT_SUCCESS) {
+    if (parsed_opts->exit_code != EXIT_SUCCESS)
+    {
         return parsed_opts->exit_code;
     }
 
-    if (parsed_opts->should_print_version_and_exit) {
+    if (parsed_opts->should_print_version_and_exit)
+    {
         printVersion();
 
         return parsed_opts->exit_code;

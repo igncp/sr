@@ -11,11 +11,13 @@ int ScrollableList_getScreenMaxDisplayedLines(ScrollableList * scrollable_list)
     return scrollable_list->height - 2;
 }
 
-int ScrollableList_getMaxLineWidth(ScrollableList * scrollable_list) {
+int ScrollableList_getMaxLineWidth(ScrollableList * scrollable_list)
+{
     return scrollable_list->width - 3;
 }
 
-ScrollableListItem * ScrollableListItem_create(char * text) {
+ScrollableListItem * ScrollableListItem_create(char * text)
+{
     ScrollableListItem * item = malloc(sizeof(ScrollableListItem));
 
     item->text = malloc(sizeof(char) * strlen(text) + 1);
@@ -26,7 +28,8 @@ ScrollableListItem * ScrollableListItem_create(char * text) {
     return item;
 }
 
-ScrollableListItem * ScrollableListItem_getLast(ScrollableListItem * items) {
+ScrollableListItem * ScrollableListItem_getLast(ScrollableListItem * items)
+{
     ScrollableListItem * node = items;
 
     while (true)
@@ -36,7 +39,8 @@ ScrollableListItem * ScrollableListItem_getLast(ScrollableListItem * items) {
             break;
         }
 
-        if (node->next == NULL) {
+        if (node->next == NULL)
+        {
             break;
         }
 
@@ -46,12 +50,15 @@ ScrollableListItem * ScrollableListItem_getLast(ScrollableListItem * items) {
     return node;
 }
 
-int ScrollableListItem_getCount(ScrollableListItem * items) {
+int ScrollableListItem_getCount(ScrollableListItem * items)
+{
     int count = 0;
     ScrollableListItem * node = items;
 
-    while(true) {
-        if (node == NULL) {
+    while(true)
+    {
+        if (node == NULL)
+        {
             break;
         }
 
@@ -62,7 +69,8 @@ int ScrollableListItem_getCount(ScrollableListItem * items) {
     return count;
 }
 
-ScrollableListItem * ScrollableListItem_getItemN(ScrollableListItem * items, int n) {
+ScrollableListItem * ScrollableListItem_getItemN(ScrollableListItem * items, int n)
+{
     int count = 0;
     ScrollableListItem * node = items;
 
@@ -83,17 +91,21 @@ ScrollableListItem * ScrollableListItem_getItemN(ScrollableListItem * items, int
     }
 }
 
-void ScrollableListItem_destroyItems(ScrollableListItem * items) {
+void ScrollableListItem_destroyItems(ScrollableListItem * items)
+{
     ScrollableListItem * node = items;
 
-    while (true) {
-        if (node == NULL) {
+    while (true)
+    {
+        if (node == NULL)
+        {
             break;
         }
 
         ScrollableListItem * r = node->next;
 
-        if (node->text) {
+        if (node->text)
+        {
             free(node->text);
         }
         free(node);
@@ -102,7 +114,8 @@ void ScrollableListItem_destroyItems(ScrollableListItem * items) {
     }
 }
 
-ScrollableListItem * ScrollableListItem_getNItems(ScrollableListItem* items, int n) {
+ScrollableListItem * ScrollableListItem_getNItems(ScrollableListItem* items, int n)
+{
     int count = 0;
     ScrollableListItem * node = items;
     ScrollableListItem * returned_item = NULL;
@@ -140,7 +153,8 @@ ScrollableListItem * ScrollableListItem_getNItems(ScrollableListItem* items, int
     return returned_item;
 }
 
-void ScrollableList_refreshList(ScrollableList * scrollable_list) {
+void ScrollableList_refreshList(ScrollableList * scrollable_list)
+{
     ScrollableListItem_destroyItems(scrollable_list->displayed_items);
 
     int all_items_count = ScrollableListItem_getCount(scrollable_list->all_items);
@@ -148,16 +162,19 @@ void ScrollableList_refreshList(ScrollableList * scrollable_list) {
 
     if (max_first_displayed_item_index < 0) max_first_displayed_item_index = 0;
 
-    if (scrollable_list->first_displayed_item_index > max_first_displayed_item_index) {
+    if (scrollable_list->first_displayed_item_index > max_first_displayed_item_index)
+    {
         scrollable_list->first_displayed_item_index = max_first_displayed_item_index;
-    } else if (scrollable_list->first_displayed_item_index < 0) {
+    }
+    else if (scrollable_list->first_displayed_item_index < 0)
+    {
         scrollable_list->first_displayed_item_index = 0;
     }
 
     ScrollableListItem * first_displayed_item = ScrollableListItem_getItemN(
-        scrollable_list->all_items,
-        scrollable_list->first_displayed_item_index
-    );
+            scrollable_list->all_items,
+            scrollable_list->first_displayed_item_index
+        );
 
     scrollable_list->displayed_items =
         ScrollableListItem_getNItems(
@@ -167,16 +184,19 @@ void ScrollableList_refreshList(ScrollableList * scrollable_list) {
 
     int displayed_items_count = ScrollableListItem_getCount(scrollable_list->displayed_items);
 
-    if (scrollable_list->selected_line_index >= displayed_items_count) {
+    if (scrollable_list->selected_line_index >= displayed_items_count)
+    {
         scrollable_list->selected_line_index = displayed_items_count - 1;
     }
 }
 
-void ScrollableList_painRowTextWithSelection(int line_index, char * text, int selection_start, int selection_end, WINDOW * window) {
+void ScrollableList_painRowTextWithSelection(int line_index, char * text, int selection_start, int selection_end, WINDOW * window)
+{
     int painted_line = line_index + 1;
     int text_len = strlen(text);
 
-    if (selection_start > 0) {
+    if (selection_start > 0)
+    {
         char subbuff[selection_start];
         memcpy(subbuff, &text[0], selection_start);
         subbuff[selection_start] = 0;
@@ -187,7 +207,8 @@ void ScrollableList_painRowTextWithSelection(int line_index, char * text, int se
     }
 
 
-    if (selection_start != selection_end) {
+    if (selection_start != selection_end)
+    {
         char subbuff[selection_end - selection_start];
         memcpy(subbuff, &text[selection_start], selection_end - selection_start);
         subbuff[selection_end - selection_start] = 0;
@@ -199,7 +220,8 @@ void ScrollableList_painRowTextWithSelection(int line_index, char * text, int se
 
     wattroff(window, A_STANDOUT);
 
-    if (selection_end < text_len - 1) {
+    if (selection_end < text_len - 1)
+    {
         char subbuff[text_len - selection_end];
         memcpy(subbuff, &text[selection_end], text_len - selection_end);
         subbuff[text_len - selection_end] = 0;
@@ -212,22 +234,27 @@ void ScrollableList_paintRowText(
     int line_index,
     const char * text,
     ScrollableList * scrollable_list
-) {
+)
+{
     char item[1024];
     int max_line_width = ScrollableList_getMaxLineWidth(scrollable_list);
     int text_len = strlen(text);
     int spaces_len = max_line_width - text_len;
     char * leftpad = NULL;
 
-    if (scrollable_list->should_center_text) {
+    if (scrollable_list->should_center_text)
+    {
         int leftpad_num = spaces_len / 2;
         leftpad = malloc(sizeof(char) * leftpad_num + 1);
 
         strcpy(leftpad, " ");
-        for (int i = 0; i < leftpad_num - 1; i++) {
+        for (int i = 0; i < leftpad_num - 1; i++)
+        {
             strcat(leftpad, " ");
         }
-    } else {
+    }
+    else
+    {
         leftpad = malloc(sizeof(char) + 1);
         strcpy(leftpad, " ");
     }
@@ -243,15 +270,18 @@ void ScrollableList_paintRowText(
     free(leftpad);
 
     int spaces_len_right = max_line_width - strlen(item);
-    for (int i = 0; i <= spaces_len_right; i++) {
+    for (int i = 0; i <= spaces_len_right; i++)
+    {
         strcat(item, " ");
     }
 
     int selection_start = 0;
     int selection_end = 0;
 
-    if (line_index == scrollable_list->selected_line_index) {
-        if (scrollable_list->selection_mode == ScrollableList_SelectionMode_LineFragment) {
+    if (line_index == scrollable_list->selected_line_index)
+    {
+        if (scrollable_list->selection_mode == ScrollableList_SelectionMode_LineFragment)
+        {
             selection_start = scrollable_list->selection_line_start_pos;
             selection_end = scrollable_list->selection_line_end_pos;
         }
@@ -262,7 +292,8 @@ void ScrollableList_paintRowText(
     ScrollableList_painRowTextWithSelection(line_index, item, selection_start, selection_end, scrollable_list->window);
 }
 
-void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index) {
+void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index)
+{
     ScrollableListItem * node = ScrollableListItem_getItemN(scrollable_list->displayed_items, line_index);
 
     ScrollableList_paintRowText(
@@ -272,7 +303,8 @@ void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index) {
     );
 }
 
-void ScrollableList_paintScreenItems(ScrollableList * scrollable_list) {
+void ScrollableList_paintScreenItems(ScrollableList * scrollable_list)
+{
     ScrollableListItem * node = scrollable_list->displayed_items;
     int displayed_items_count = ScrollableListItem_getCount(node);
     int i = 0;
@@ -293,8 +325,10 @@ void ScrollableList_paintScreenItems(ScrollableList * scrollable_list) {
 
     int max_displayed_lines = ScrollableList_getScreenMaxDisplayedLines(scrollable_list);
 
-    if (displayed_items_count < max_displayed_lines) {
-        for(i = displayed_items_count; i < max_displayed_lines; i++) {
+    if (displayed_items_count < max_displayed_lines)
+    {
+        for(i = displayed_items_count; i < max_displayed_lines; i++)
+        {
             ScrollableList_paintRowText(
                 i,
                 " ",
@@ -307,7 +341,8 @@ void ScrollableList_paintScreenItems(ScrollableList * scrollable_list) {
     box(scrollable_list->window, 0, 0);
 }
 
-ScrollableList ScrollableList_create(struct ScrollableListCreateOpts opts) {
+ScrollableList ScrollableList_create(struct ScrollableListCreateOpts opts)
+{
     ScrollableList scrollable_list;
 
     scrollable_list.all_items = opts.all_items;
@@ -334,7 +369,8 @@ ScrollableList ScrollableList_create(struct ScrollableListCreateOpts opts) {
     return scrollable_list;
 }
 
-void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int movement_positions) {
+void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int movement_positions)
+{
     int all_items_count = ScrollableListItem_getCount(scrollable_list->all_items);
     int displayed_items_count = ScrollableListItem_getCount(scrollable_list->displayed_items);
 
@@ -366,9 +402,12 @@ void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int 
         {
             scrollable_list->first_displayed_item_index += movement_positions;
 
-            if (is_inside_list) {
+            if (is_inside_list)
+            {
                 scrollable_list->selected_line_index = current_index;
-            } else {
+            }
+            else
+            {
                 scrollable_list->selected_line_index = displayed_items_count - 1;
             }
         }
@@ -376,9 +415,12 @@ void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int 
         {
             scrollable_list->first_displayed_item_index += movement_positions;
 
-            if (is_inside_list) {
+            if (is_inside_list)
+            {
                 scrollable_list->selected_line_index = current_index;
-            } else {
+            }
+            else
+            {
                 scrollable_list->selected_line_index = 0;
             }
         }
@@ -387,21 +429,25 @@ void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int 
 
         if (first_displayed_diff > 0)
         {
-            if (scrollable_list->selected_line_index + first_displayed_diff < displayed_items_count) {
+            if (scrollable_list->selected_line_index + first_displayed_diff < displayed_items_count)
+            {
                 scrollable_list->selected_line_index += first_displayed_diff;
             }
             scrollable_list->first_displayed_item_index = max_first_displayed;
-        } else if (scrollable_list->first_displayed_item_index < 0) {
-            if (scrollable_list->selected_line_index + scrollable_list->first_displayed_item_index >= 0) {
+        }
+        else if (scrollable_list->first_displayed_item_index < 0)
+        {
+            if (scrollable_list->selected_line_index + scrollable_list->first_displayed_item_index >= 0)
+            {
                 scrollable_list->selected_line_index += scrollable_list->first_displayed_item_index;
             }
             scrollable_list->first_displayed_item_index = 0;
         }
 
         ScrollableListItem * first_item = ScrollableListItem_getItemN(
-            scrollable_list->all_items,
-            scrollable_list->first_displayed_item_index
-        );
+                scrollable_list->all_items,
+                scrollable_list->first_displayed_item_index
+            );
 
         ScrollableListItem_destroyItems(scrollable_list->displayed_items);
 
@@ -415,13 +461,15 @@ void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int 
     scrollable_list->onMove(scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index);
 }
 
-void ScrollableList_handleEnter(ScrollableList * scrollable_list) {
+void ScrollableList_handleEnter(ScrollableList * scrollable_list)
+{
     int absolute_index = scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index;
 
     scrollable_list->onEnter(scrollable_list, absolute_index);
 }
 
-void ScrollableList_waitForKey(ScrollableList * scrollable_list) {
+void ScrollableList_waitForKey(ScrollableList * scrollable_list)
+{
     int ch;
     while((ch = wgetch(scrollable_list->window)) != 'q')
     {
@@ -455,18 +503,21 @@ void ScrollableList_waitForKey(ScrollableList * scrollable_list) {
         ScrollableList_paintScreenItems(scrollable_list);
 
         if(scrollable_list->all_items == NULL ||
-            scrollable_list->displayed_items == NULL) {
+            scrollable_list->displayed_items == NULL)
+        {
             break;
         }
     }
 }
 
-void ScrollableList_refreshAndPaintList(ScrollableList * scrollable_list) {
+void ScrollableList_refreshAndPaintList(ScrollableList * scrollable_list)
+{
     ScrollableList_refreshList(scrollable_list);
     ScrollableList_paintScreenItems(scrollable_list);
 }
 
-void ScrollableList_destroyWithItems(ScrollableList * scrollable_list) {
+void ScrollableList_destroyWithItems(ScrollableList * scrollable_list)
+{
     ScrollableListItem_destroyItems(scrollable_list->all_items);
     ScrollableListItem_destroyItems(scrollable_list->displayed_items);
 }

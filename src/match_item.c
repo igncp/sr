@@ -131,11 +131,13 @@ MatchItem * MatchItem_copySingle(MatchItem * item)
 
 MatchItem * MatchItem_moveFirstToEnd(MatchItem * item)
 {
-    if (item == NULL) {
+    if (item == NULL)
+    {
         return NULL;
     }
 
-    if (item->next == NULL) {
+    if (item->next == NULL)
+    {
         return item;
     }
 
