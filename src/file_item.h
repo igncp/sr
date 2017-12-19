@@ -14,7 +14,7 @@ int FileItem_countList(FileItem * initial_node);
 
 FileItem * FileItem_getItemN(FileItem * initial_node, int n);
 FileItem * FileItem_getLast(FileItem * initial_node);
-FileItem * FileItem_getFilesList(char *name);
-FileItem * FileItem_copySingle(FileItem * item);
+FileItem * FileItem_getFilesListFromPath(char *name);
+FileItem * FileItem_getFilesListFromFile(char *name);
 
 #endif

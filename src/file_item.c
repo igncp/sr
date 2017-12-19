@@ -1,3 +1,5 @@
+#include "file_item.h"
+
 #include <dirent.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -5,7 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "file_item.h"
+#include "file_io.h"
+#include "str_utils.h"
 
 FileItem * FileItem_getLast(FileItem * initial_node)
 {
@@ -24,7 +27,7 @@ FileItem * FileItem_getLast(FileItem * initial_node)
     return node;
 }
 
-FileItem * FileItem_getFilesList(char *name)
+FileItem * FileItem_getFilesListFromPath(char *name)
 {
     DIR *dir;
     struct dirent *entry;
@@ -70,7 +73,7 @@ FileItem * FileItem_getFilesList(char *name)
 
             snprintf(path, sizeof(path), "%s/%s", used_name, entry->d_name);
 
-            FileItem * r = FileItem_getFilesList(path);
+            FileItem * r = FileItem_getFilesListFromPath(path);
 
             if (r != NULL)
             {
@@ -198,13 +201,56 @@ FileItem * FileItem_getItemN(FileItem * item, int n)
     }
 }
 
-FileItem * FileItem_copySingle(FileItem * item)
+FileItem * FileItem_getFilesListFromFile(char *name)
 {
-    FileItem * new = malloc(sizeof(FileItem));
+    char * file_content = NULL;
 
-    new->path = item->path;
-    new->next = NULL;
+    if (strcmp(name, PROCESS_SUBSTITUTION_PIPE) == 0)
+    {
+        file_content = FileIO_getNamedPipeContent(name);
+    }
+    else
+    {
+        file_content = FileIO_getFileContent(name);
+    }
 
-    return new;
+    FileItem * files_list = NULL;
+    FileItem * files_list_last = NULL;
+
+    struct StrUtils_Line * lines = StrUtils_Line_splitStrInLines(file_content, 10 * 1000 * 1000);
+    struct StrUtils_Line * line = lines;
+
+    while (true)
+    {
+        if (line == NULL)
+        {
+            break;
+        }
+
+        if (strcmp(line->text, "") != 0)
+        {
+            FileItem * r = malloc(sizeof(FileItem));
+            r->path = strdup(line->text);
+            r->next = NULL;
+
+            if (files_list == NULL)
+            {
+                files_list = r;
+            }
+            else
+            {
+                files_list_last->next = r;
+            }
+
+            files_list_last = r;
+        }
+
+        line = line->next;
+    }
+
+    StrUtils_Line_destroyList(lines);
+
+    free(file_content);
+
+    return files_list;
 }
-

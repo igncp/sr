@@ -8,8 +8,11 @@ typedef struct ParsedOpts
     char * searchPath;
     char * searchPattern;
     char * searchReplacement;
+
     bool should_print_version_and_exit;
     bool should_add_delimiters;
+    bool should_read_files_from_file;
+
     int exit_code;
 } ParsedOpts;
 

@@ -18,8 +18,8 @@ if (POSSIBLE_RELEASE_TYPES.indexOf(releaseType) === -1) {
   process.exit(1)
 }
 
-const srFileContent = fs.readFileSync('src/sr.c', 'utf-8')
-const currentVersionMatch = srFileContent.match(new RegExp(REGEX_STR))
+const versionFileContent = fs.readFileSync('src/version.h', 'utf-8')
+const currentVersionMatch = versionFileContent.match(new RegExp(REGEX_STR))
 
 if (!currentVersionMatch) {
   console.log('Could not find the current version')
@@ -43,13 +43,14 @@ if (releaseType === 'patch') {
 }
 
 const newVersion = currentVersionFragments.join('.')
-const newSrFileContent = srFileContent.replace(new RegExp(REGEX_STR), `#define VERSION "${newVersion}"`)
+const newVersionFileContent = versionFileContent
+  .replace(new RegExp(REGEX_STR), `#define VERSION "${newVersion}"`)
 
-fs.writeFileSync('src/sr.c', newSrFileContent)
+fs.writeFileSync('src/version.h', newVersionFileContent)
 
 execSync(`
 git reset && \
-  git add src/sr.c && \
+  git add src/version.h && \
   git commit -m "v${newVersion}" && \
   git tag "v${newVersion}"
 `)
