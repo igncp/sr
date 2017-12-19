@@ -37,10 +37,12 @@ int main(int argc, char *argv[])
 
     MatchesUI_listMatches(parsed_opts, matched_file);
 
+    int exit_code = parsed_opts->exit_code;
+
     free(parsed_opts->searchPath);
     free(parsed_opts->searchPattern);
     free(parsed_opts->searchReplacement);
     free(parsed_opts);
 
-    return parsed_opts->exit_code;
+    return exit_code;
 }

@@ -2,7 +2,8 @@
 
 #include <check.h>
 #include <stdlib.h>
-#include <stdio.h>
+
+#include "test_test_helpers.h"
 
 #include "../src/match_item.h"
 
@@ -101,16 +102,5 @@ Suite * test_MatchItem_suite(void)
 
 int test_MatchItem_getFailed()
 {
-    int number_failed;
-    SRunner *sr = srunner_create(test_MatchItem_suite());
-
-    srunner_run_all(sr, CK_VERBOSE);
-
-    number_failed = srunner_ntests_failed(sr);
-
-    puts("\n");
-
-    srunner_free(sr);
-
-    return number_failed;
+    TEST_HELPERS_GET_FAILED(test_MatchItem_suite);
 }

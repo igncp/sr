@@ -62,7 +62,11 @@ regex_t * getCompiledRegex(char * regex_str)
     return regex;
 }
 
-struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(char * str, char * uncompiled_regex, int index)
+struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(
+    char * str,
+    char * uncompiled_regex,
+    int index
+)
 {
     regex_t * compiled_regex = getCompiledRegex(uncompiled_regex);
     struct Search_RegexPositions pos;

@@ -190,44 +190,70 @@ void ScrollableList_refreshList(ScrollableList * scrollable_list)
     }
 }
 
-void ScrollableList_painRowTextWithSelection(int line_index, char * text, int selection_start, int selection_end, WINDOW * window)
+void ScrollableList_painRowTextWithSelection(ScrollableList * scrollable_list, int line_index, char * text, int selection_start, int selection_end)
 {
     int painted_line = line_index + 1;
-    int text_len = strlen(text);
+    int full_text_len = strlen(text);
+    int max_len = scrollable_list->width;
+    char * printed_text = NULL;
+
+    if (max_len >= full_text_len)
+    {
+        printed_text = strdup(text);
+    }
+    else
+    {
+        printed_text = malloc(sizeof(char) * max_len + 1);
+
+        snprintf(printed_text, max_len - 1, "%s", text);
+        printed_text[max_len] = 0;
+    }
+
+    if (selection_start >= max_len)
+    {
+        selection_start = max_len - 1;
+    }
+
+    if (selection_end >= max_len)
+    {
+        selection_end  = max_len - 1;
+    }
 
     if (selection_start > 0)
     {
         char subbuff[selection_start];
-        memcpy(subbuff, &text[0], selection_start);
+        memcpy(subbuff, &printed_text[0], selection_start);
         subbuff[selection_start] = 0;
 
-        wattroff(window, A_STANDOUT);
+        wattroff(scrollable_list->window, A_STANDOUT);
 
-        mvwprintw(window, painted_line, 1, "%s", subbuff);
+        mvwprintw(scrollable_list->window, painted_line, 1, "%s", subbuff);
     }
 
 
     if (selection_start != selection_end)
     {
         char subbuff[selection_end - selection_start];
-        memcpy(subbuff, &text[selection_start], selection_end - selection_start);
+        memcpy(subbuff, &printed_text[selection_start], selection_end - selection_start);
         subbuff[selection_end - selection_start] = 0;
 
-        wattron(window, A_STANDOUT);
+        wattron(scrollable_list->window, A_STANDOUT);
 
-        mvwprintw(window, painted_line, 1 + selection_start, "%s", subbuff);
+        mvwprintw(scrollable_list->window, painted_line, 1 + selection_start, "%s", subbuff);
     }
 
-    wattroff(window, A_STANDOUT);
+    wattroff(scrollable_list->window, A_STANDOUT);
 
-    if (selection_end < text_len - 1)
+    if (selection_end < max_len - 1)
     {
-        char subbuff[text_len - selection_end];
-        memcpy(subbuff, &text[selection_end], text_len - selection_end);
-        subbuff[text_len - selection_end] = 0;
+        char subbuff[max_len - selection_end];
+        memcpy(subbuff, &printed_text[selection_end], max_len - 1 - selection_end);
+        subbuff[max_len - selection_end] = 0;
 
-        mvwprintw(window, painted_line, 1 + selection_end, "%s", subbuff);
+        mvwprintw(scrollable_list->window, painted_line, 1 + selection_end, "%s", subbuff);
     }
+
+    free(printed_text);
 }
 
 void ScrollableList_paintRowText(
@@ -289,7 +315,7 @@ void ScrollableList_paintRowText(
             selection_end = strlen(item);
     }
 
-    ScrollableList_painRowTextWithSelection(line_index, item, selection_start, selection_end, scrollable_list->window);
+    ScrollableList_painRowTextWithSelection(scrollable_list, line_index, item, selection_start, selection_end);
 }
 
 void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index)

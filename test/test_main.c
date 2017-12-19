@@ -4,6 +4,7 @@
 
 #include "test_file_item.h"
 #include "test_match_item.h"
+#include "test_str_utils.h"
 
 int main(void)
 {
@@ -11,6 +12,7 @@ int main(void)
 
     number_failed += test_FileItem_getFailed();
     number_failed += test_MatchItem_getFailed();
+    number_failed += test_StrUtils_getFailed();
 
     if (number_failed > 0)
     {

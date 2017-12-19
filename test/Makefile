@@ -7,6 +7,8 @@ default:
 		-lcurses \
 		-ltinfo \
 		-lcheck \
+		-fprofile-arcs \
+		-ftest-coverage \
 		./*.c \
 		${SRC_FILES} \
 		-o ../build/test/test_result

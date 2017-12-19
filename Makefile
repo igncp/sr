@@ -16,4 +16,7 @@ default:
 		echo "built correctly"
 
 clean:
+	@rm -f test/test_main
 	@find . -type f -name "*.orig" | xargs -I{} rm {}
+	@find . -type f -name "*.gcda" | xargs -I{} rm {}
+	@find . -type f -name "*.gcno" | xargs -I{} rm {}

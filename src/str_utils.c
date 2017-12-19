@@ -103,6 +103,8 @@ void StrUtils_Line_destroyList(struct StrUtils_Line * line)
 
         node = node->next;
 
+        node_to_free->next = NULL;
+
         free(node_to_free->text);
         free(node_to_free);
     }

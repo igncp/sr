@@ -3,3 +3,7 @@ build
 *.orig
 valgrind-*
 node_modules
+coverage
+*.gcda
+*.gcno
+test/test_main

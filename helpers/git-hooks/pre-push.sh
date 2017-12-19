@@ -1,8 +1,3 @@
 #!/usr/bin/env bash
 
-echo "Running tests ..."
-
-cd test
-make && \
-  cd .. && \
-  ./build/test/test_result
+sh helpers/run_tests_without_coverage.sh
