@@ -2,11 +2,9 @@
 
 Search and replace for the command line.
 
-**This project is under active development**
-
 ## Install
 
-As it is still in an early stage, there is not much functionality available.
+As it is still in an early stage, but it has useful features available.
 
 If you want to try it, you will need to install ncurses. Currently it is only tested under Arch Linux.
 
