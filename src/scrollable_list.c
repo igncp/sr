@@ -3,17 +3,34 @@
 #include <stdlib.h>
 
 #include "scrollable_list.h"
+#include "str_utils.h"
 
 #define KEY_ENTER_FIXED 10
+#define LEFT_SCROLL_SYMBOL "[..]"
 
 int ScrollableList_getScreenMaxDisplayedLines(ScrollableList * scrollable_list)
 {
     return scrollable_list->height - 2;
 }
 
-int ScrollableList_getMaxLineWidth(ScrollableList * scrollable_list)
+int ScrollableList_getMaxFullLineWidth(ScrollableList * scrollable_list)
 {
     return scrollable_list->width - 3;
+}
+
+int ScrollableList_getMaxLineContentWidth(
+    ScrollableList * scrollable_list,
+    int digits_for_items
+)
+{
+    int line_number_fragment = 0;
+
+    if (scrollable_list->should_display_line_numbers)
+    {
+        line_number_fragment += 1 + digits_for_items;
+    }
+
+    return ScrollableList_getMaxFullLineWidth(scrollable_list) - line_number_fragment;
 }
 
 ScrollableListItem * ScrollableListItem_create(char * text)
@@ -190,9 +207,20 @@ void ScrollableList_refreshList(ScrollableList * scrollable_list)
     }
 }
 
-void ScrollableList_painRowTextWithSelection(ScrollableList * scrollable_list, int line_index, char * text, int selection_start, int selection_end)
+struct LineSelection
 {
-    int painted_line = line_index + 1;
+    int selection_start;
+    int selection_end;
+};
+
+void ScrollableList_paintRowTextWithSelection(
+    ScrollableList * scrollable_list,
+    int line_index,
+    char * text,
+    struct LineSelection * line_selection
+)
+{
+    int line_number = line_index + 1;
     int full_text_len = strlen(text);
     int max_len = scrollable_list->width;
     char * printed_text = NULL;
@@ -209,61 +237,67 @@ void ScrollableList_painRowTextWithSelection(ScrollableList * scrollable_list, i
         printed_text[max_len] = 0;
     }
 
-    if (selection_start >= max_len)
+    if (line_selection->selection_start >= max_len)
     {
-        selection_start = max_len - 1;
+        line_selection->selection_start = max_len - 1;
     }
 
-    if (selection_end >= max_len)
+    if (line_selection->selection_end >= max_len)
     {
-        selection_end  = max_len - 1;
+        line_selection->selection_end  = max_len - 1;
     }
 
-    if (selection_start > 0)
+    if (line_selection->selection_start > 0)
     {
-        char subbuff[selection_start];
-        memcpy(subbuff, &printed_text[0], selection_start);
-        subbuff[selection_start] = 0;
+        char subbuff[line_selection->selection_start];
+        memcpy(subbuff, &printed_text[0], line_selection->selection_start);
+        subbuff[line_selection->selection_start] = 0;
 
         wattroff(scrollable_list->window, A_STANDOUT);
 
-        mvwprintw(scrollable_list->window, painted_line, 1, "%s", subbuff);
+        mvwprintw(scrollable_list->window, line_number, 1, "%s", subbuff);
     }
 
-
-    if (selection_start != selection_end)
+    if (line_selection->selection_start != line_selection->selection_end)
     {
-        char subbuff[selection_end - selection_start];
-        memcpy(subbuff, &printed_text[selection_start], selection_end - selection_start);
-        subbuff[selection_end - selection_start] = 0;
+        char subbuff[line_selection->selection_end - line_selection->selection_start];
+        memcpy(
+            subbuff,
+            &printed_text[line_selection->selection_start],
+            line_selection->selection_end - line_selection->selection_start
+        );
+        subbuff[line_selection->selection_end - line_selection->selection_start] = 0;
 
         wattron(scrollable_list->window, A_STANDOUT);
 
-        mvwprintw(scrollable_list->window, painted_line, 1 + selection_start, "%s", subbuff);
+        mvwprintw(scrollable_list->window, line_number, 1 + line_selection->selection_start, "%s", subbuff);
     }
 
     wattroff(scrollable_list->window, A_STANDOUT);
 
-    if (selection_end < max_len - 1)
+    if (line_selection->selection_end < max_len - 1)
     {
-        char subbuff[max_len - selection_end];
-        memcpy(subbuff, &printed_text[selection_end], max_len - 1 - selection_end);
-        subbuff[max_len - selection_end] = 0;
+        char subbuff[max_len - line_selection->selection_end];
+        memcpy(
+            subbuff,
+            &printed_text[line_selection->selection_end],
+            max_len - 1 - line_selection->selection_end
+        );
+        subbuff[max_len - line_selection->selection_end] = 0;
 
-        mvwprintw(scrollable_list->window, painted_line, 1 + selection_end, "%s", subbuff);
+        mvwprintw(scrollable_list->window, line_number, 1 + line_selection->selection_end, "%s", subbuff);
     }
 
     free(printed_text);
 }
 
-void ScrollableList_paintRowText(
-    int line_index,
-    const char * text,
-    ScrollableList * scrollable_list
+char * ScrollableList_createRowTextWithLeftPad(
+    ScrollableList * scrollable_list,
+    const char * text
 )
 {
-    char item[1024];
-    int max_line_width = ScrollableList_getMaxLineWidth(scrollable_list);
+    char * rowText = malloc(sizeof(char) * 1024);
+    int max_line_width = ScrollableList_getMaxFullLineWidth(scrollable_list);
     int text_len = strlen(text);
     int spaces_len = max_line_width - text_len;
     char * leftpad = NULL;
@@ -286,7 +320,7 @@ void ScrollableList_paintRowText(
     }
 
     snprintf(
-        item,
+        rowText,
         max_line_width,
         "%s%s",
         leftpad,
@@ -295,44 +329,200 @@ void ScrollableList_paintRowText(
 
     free(leftpad);
 
-    int spaces_len_right = max_line_width - strlen(item);
+    int spaces_len_right = max_line_width - strlen(rowText);
     for (int i = 0; i <= spaces_len_right; i++)
     {
-        strcat(item, " ");
+        strcat(rowText, " ");
     }
 
-    int selection_start = 0;
-    int selection_end = 0;
+    return rowText;
+}
+
+struct LineSelection * ScrollableList_getSelectionToList(
+    ScrollableList * scrollable_list,
+    int line_index,
+    char * row_text
+)
+{
+    struct LineSelection * line_selection = malloc(sizeof(struct LineSelection));
+    line_selection->selection_start = 0;
+    line_selection->selection_end = 0;
 
     if (line_index == scrollable_list->selected_line_index)
     {
         if (scrollable_list->selection_mode == ScrollableList_SelectionMode_LineFragment)
         {
-            selection_start = scrollable_list->selection_line_start_pos;
-            selection_end = scrollable_list->selection_line_end_pos;
+            int extra = (scrollable_list->left_scroll > 0)
+                ? scrollable_list->left_scroll - strlen(LEFT_SCROLL_SYMBOL)
+                : 0;
+
+            line_selection->selection_start = scrollable_list->selection_line_start_pos - extra;
+            line_selection->selection_end = scrollable_list->selection_line_end_pos - extra;
         }
         else if(scrollable_list->selection_mode != ScrollableList_SelectionMode_NoSelection)
-            selection_end = strlen(item);
+            line_selection->selection_end = strlen(row_text);
     }
 
-    ScrollableList_painRowTextWithSelection(scrollable_list, line_index, item, selection_start, selection_end);
+    return line_selection;
 }
 
-void ScrollableList_paintRow(ScrollableList* scrollable_list, int line_index)
+void ScrollableList_addLineNumberToRowIfNecessary(
+    ScrollableList * scrollable_list,
+    char * row_text,
+    int digits_for_items,
+    int line_index,
+    int all_items_count,
+    struct LineSelection * line_selection
+)
 {
-    ScrollableListItem * node = ScrollableListItem_getItemN(scrollable_list->displayed_items, line_index);
+    if (scrollable_list->should_display_line_numbers &&
+        all_items_count > line_index)
+    {
+        int line_absolute_number = line_index + 1 + scrollable_list->first_displayed_item_index;
+        int digits_for_line = StrUtils_getDigitsForNumber(line_absolute_number);
+        int digits_diff = digits_for_items - digits_for_line;
 
-    ScrollableList_paintRowText(
+        char * number_text = malloc(sizeof(char) * digits_for_line + 1);
+
+        sprintf(
+            number_text,
+            "%d",
+            line_absolute_number
+        );
+        number_text[digits_for_line] = 0;
+
+        int new_line_chars = digits_for_items + 1; // the extra is a space
+        char * number_text_with_spaces = malloc(sizeof(char) * new_line_chars + 1);
+
+        strcpy(number_text_with_spaces, " ");
+        for (int i = 0; i < digits_diff; i++)
+        {
+            strcat(number_text_with_spaces, " ");
+        }
+        strcat(number_text_with_spaces, number_text);
+
+        number_text_with_spaces[digits_for_items + 1] = 0;
+
+        char * orig_row_text = strdup(row_text);
+
+        snprintf(
+            row_text,
+            ScrollableList_getMaxFullLineWidth(scrollable_list),
+            "%s%s",
+            number_text_with_spaces,
+            orig_row_text
+        );
+
+        line_selection->selection_start += new_line_chars;
+        line_selection->selection_end += new_line_chars;
+
+        free(orig_row_text);
+        free(number_text_with_spaces);
+        free(number_text);
+    }
+}
+
+char * ScrollableList_createRowTextWithLeftScroll(
+    ScrollableList * scrollable_list,
+    const char * text
+)
+{
+    char * text_dup = strdup(text);
+    char * orig_text_dup = text_dup;
+    char * row_text_with_scroll = NULL;
+
+    if (scrollable_list->left_scroll)
+    {
+        if (strlen(text_dup) > scrollable_list->left_scroll)
+        {
+            text_dup += scrollable_list->left_scroll;
+            row_text_with_scroll = StrUtils_createStrWithTwoStrings(LEFT_SCROLL_SYMBOL, text_dup);
+        }
+        else
+        {
+            row_text_with_scroll = strdup("");
+        }
+    }
+    else
+    {
+        row_text_with_scroll = strdup(text_dup);
+    }
+
+    free(orig_text_dup);
+
+    return row_text_with_scroll;
+}
+
+void ScrollableList_paintRowText(
+    int line_index,
+    const char * text,
+    ScrollableList * scrollable_list,
+    int digits_for_items,
+    int all_items_count
+)
+{
+    char * row_text_with_scroll = ScrollableList_createRowTextWithLeftScroll(
+            scrollable_list,
+            text
+        );
+
+    char * row_text_with_left_pad = ScrollableList_createRowTextWithLeftPad(
+            scrollable_list,
+            row_text_with_scroll
+        );
+
+    struct LineSelection * line_selection = ScrollableList_getSelectionToList(
+            scrollable_list,
+            line_index,
+            row_text_with_left_pad
+        );
+
+    ScrollableList_addLineNumberToRowIfNecessary(
+        scrollable_list,
+        row_text_with_left_pad,
+        digits_for_items,
         line_index,
-        node->text,
-        scrollable_list
+        all_items_count,
+        line_selection
     );
+
+    ScrollableList_paintRowTextWithSelection(
+        scrollable_list,
+        line_index,
+        row_text_with_left_pad,
+        line_selection
+    );
+
+    free(row_text_with_scroll);
+    free(row_text_with_left_pad);
+    free(line_selection);
+}
+
+void ScrollableList_setLeftScroll(ScrollableList * scrollable_list, int digits_for_items)
+{
+    scrollable_list->left_scroll = 0;
+
+    if (scrollable_list->selection_mode == ScrollableList_SelectionMode_LineFragment)
+    {
+        int max_line_width = ScrollableList_getMaxLineContentWidth(scrollable_list, digits_for_items);
+
+        if (scrollable_list->selection_line_start_pos > max_line_width)
+        {
+            scrollable_list->left_scroll = scrollable_list->selection_line_start_pos - max_line_width / 3;
+        }
+    }
 }
 
 void ScrollableList_paintScreenItems(ScrollableList * scrollable_list)
 {
     ScrollableListItem * node = scrollable_list->displayed_items;
+
     int displayed_items_count = ScrollableListItem_getCount(node);
+    int all_items_count = ScrollableListItem_getCount(scrollable_list->all_items);
+    int digits_for_items = StrUtils_getDigitsForNumber(all_items_count);
+
+    ScrollableList_setLeftScroll(scrollable_list, digits_for_items);
+
     int i = 0;
 
     while (true)
@@ -342,7 +532,16 @@ void ScrollableList_paintScreenItems(ScrollableList * scrollable_list)
             break;
         }
 
-        ScrollableList_paintRow(scrollable_list, i);
+        ScrollableListItem * item = ScrollableListItem_getItemN(scrollable_list->displayed_items, i);
+
+        ScrollableList_paintRowText(
+            i,
+            item->text,
+            scrollable_list,
+            digits_for_items,
+            all_items_count
+        );
+
         wrefresh(scrollable_list->window);
 
         node = node->next;
@@ -358,7 +557,9 @@ void ScrollableList_paintScreenItems(ScrollableList * scrollable_list)
             ScrollableList_paintRowText(
                 i,
                 " ",
-                scrollable_list
+                scrollable_list,
+                digits_for_items,
+                all_items_count
             );
         }
     }
@@ -366,6 +567,8 @@ void ScrollableList_paintScreenItems(ScrollableList * scrollable_list)
     wrefresh(scrollable_list->window);
     box(scrollable_list->window, 0, 0);
 }
+
+void noopKeyFn(struct ScrollableList* l, int selected_index) {}
 
 ScrollableList ScrollableList_create(struct ScrollableListCreateOpts opts)
 {
@@ -375,17 +578,22 @@ ScrollableList ScrollableList_create(struct ScrollableListCreateOpts opts)
     scrollable_list.displayed_items = NULL;
     scrollable_list.width = opts.list_width;
     scrollable_list.height = opts.list_height;
+    scrollable_list.left_scroll = 0;
     scrollable_list.selected_line_index = 0;
     scrollable_list.first_displayed_item_index = 0;
     scrollable_list.should_center_text = opts.should_center_text;
+    scrollable_list.should_display_line_numbers = opts.should_display_line_numbers;
     scrollable_list.window = opts.window;
     scrollable_list.selection_mode = opts.selection_mode;
+
+    scrollable_list.onKey_r_Pressed = &noopKeyFn;
+    scrollable_list.onEnter = &noopKeyFn;
 
     ScrollableList_refreshList(&scrollable_list);
 
     ScrollableList_paintScreenItems(&scrollable_list);
 
-    wrefresh(opts.window);
+    wrefresh(scrollable_list.window);
 
     keypad(opts.window, TRUE);
     curs_set(0);
@@ -487,18 +695,14 @@ void ScrollableList_tryToMoveSelectedLine(ScrollableList * scrollable_list, int 
     scrollable_list->onMove(scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index);
 }
 
-void ScrollableList_handleEnter(ScrollableList * scrollable_list)
-{
-    int absolute_index = scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index;
-
-    scrollable_list->onEnter(scrollable_list, absolute_index);
-}
-
 void ScrollableList_waitForKey(ScrollableList * scrollable_list)
 {
     int ch;
     while((ch = wgetch(scrollable_list->window)) != 'q')
     {
+        int absolute_index =
+            scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index;
+
         if (ch == KEY_UP)
         {
             ScrollableList_tryToMoveSelectedLine(scrollable_list, -1);
@@ -523,7 +727,11 @@ void ScrollableList_waitForKey(ScrollableList * scrollable_list)
         }
         else if (ch == KEY_ENTER_FIXED)
         {
-            ScrollableList_handleEnter(scrollable_list);
+            scrollable_list->onEnter(scrollable_list, absolute_index);
+        }
+        else if (ch == 'r')
+        {
+            scrollable_list->onKey_r_Pressed(scrollable_list, absolute_index);
         }
 
         ScrollableList_paintScreenItems(scrollable_list);

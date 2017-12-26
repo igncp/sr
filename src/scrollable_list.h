@@ -37,14 +37,18 @@ typedef struct ScrollableList
     int selection_line_end_pos;
 
     int first_displayed_item_index;
+    unsigned int left_scroll;
+
     int width;
     int height;
 
     bool should_center_text;
+    bool should_display_line_numbers;
 
     WINDOW * window;
 
     void (*onEnter)(struct ScrollableList*, int selected_index);
+    void (*onKey_r_Pressed)(struct ScrollableList*, int selected_index);
     void (*onMove)(int absolute_selected_index);
 } ScrollableList;
 
@@ -53,6 +57,7 @@ struct ScrollableListCreateOpts
     ScrollableListItem * all_items;
     WINDOW * window;
     bool should_center_text;
+    bool should_display_line_numbers;
     int list_height;
     int list_width;
     int selection_mode;

@@ -26,17 +26,22 @@ char * FileIO_getFileContent(char * file_path)
     return file_contents;
 }
 
-#define MAX_NAMED_PIPE_BUFF_SIZE 102400
+#define MAX_NAMED_PIPE_BUFF_SIZE 1024
 
 char * FileIO_getNamedPipeContent(char * named_pipe_path)
 {
     int bytes_read;
-    char named_pipe_buffer[MAX_NAMED_PIPE_BUFF_SIZE];
+
+    char * total_buffer = malloc(sizeof(char) * MAX_NAMED_PIPE_BUFF_SIZE * 100000);
 
     int fd = open(named_pipe_path, O_RDONLY);
 
+    strcpy(total_buffer, "");
+
     while(true)
     {
+        char named_pipe_buffer[MAX_NAMED_PIPE_BUFF_SIZE];
+
         bytes_read = read(fd, named_pipe_buffer, MAX_NAMED_PIPE_BUFF_SIZE - 1);
 
         if(bytes_read == 0)
@@ -45,15 +50,19 @@ char * FileIO_getNamedPipeContent(char * named_pipe_path)
         }
 
         named_pipe_buffer[bytes_read] = '\0';
+
+        strcat(total_buffer, named_pipe_buffer);
     }
 
     close(fd);
 
-    int buffer_length = strlen(named_pipe_buffer);
+    int buffer_length = strlen(total_buffer);
     char * file_contents = malloc(sizeof(char) * buffer_length + 1);
-    snprintf(file_contents, buffer_length, "%s", named_pipe_buffer);
+    snprintf(file_contents, buffer_length, "%s", total_buffer);
 
     file_contents[buffer_length] = 0;
+
+    free(total_buffer);
 
     return file_contents;
 }

@@ -2,6 +2,7 @@
 #define MATCH_ITEM_H
 
 #include <stddef.h>
+
 #include "file_item.h"
 
 typedef struct MatchItem

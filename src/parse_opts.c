@@ -4,7 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char doc[] = "Search and replace for the command line.";
+#define ARGS_HELP_BEFORE "Search and replace for the command line."
+#define ARGS_HELP_AFTER \
+    "Available keys in the replacements list:\n"\
+    "  q or Control+c: Exit list\n"\
+    "  Enter: Replace entry in file\n"\
+    "  Up, Down, PageUp, PageDown: Move around the list\n"\
+    "  r: Refresh matches of selected file\n"\
+    "\n"\
+    "Examples:\n"\
+    "  # Show a list with replacements from Foo to Bar in the current dir\n"\
+    "  sr . Foo Bar\n\n"\
+    "  # Show a list with replacements from \\bFoo\\b to Bar in the markdown files\n"\
+    "  sr <(find . -name \"*.md\") Foo Bar -fd"
+#define ARGS_HELP_FULL ARGS_HELP_BEFORE "\v" ARGS_HELP_AFTER
+
 static char args_doc[] = "PATH SEARCH_PATTERN REPLACEMENT";
 static struct argp_option options[] =
 {
@@ -61,7 +75,7 @@ static struct argp argp =
     options,
     parseOpt,
     args_doc,
-    doc,
+    ARGS_HELP_FULL,
     0,
     0,
     0

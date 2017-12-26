@@ -10,7 +10,6 @@ None.
 
 ## Features
 
-- Better experience for large files and long lines
 - Add case insensitive opts
 - Add option to replace matches directly, without list
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include "parse_opts.h"
 #include "file_item.h"
@@ -24,6 +25,8 @@ int main(int argc, char *argv[])
 
         return parsed_opts->exit_code;
     }
+
+    setlocale(LC_ALL, "en_US.UTF-8");
 
     FileItem * normal_file_item = OptsHandlers_getFilesLists(parsed_opts);
 

@@ -11,7 +11,6 @@
 #include "str_utils.h"
 #include "search.h"
 
-#include <unistd.h> // @TODO remove
 static MatchItem * g_all_matched_items;
 static ScrollableList * g_preview_list;
 static ScrollableList * g_header_list;
@@ -54,7 +53,7 @@ ScrollableListItem * MatchesUI_getAllMatchesListItems(void)
     return scrollable_list_items;
 }
 
-#define MATCHES_UI_MAX_SPLIT_LINES 1000
+#define MATCHES_UI_MAX_SPLIT_LINES 2000
 
 ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index)
 {
@@ -131,8 +130,6 @@ ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index)
         p->next = NULL;
     }
 
-    STR_UTILS_ADD_LINE_NUMBERS(ScrollableListItem, scrollable_list_items, items_count);
-
     if (match_line_index < items_count)
     {
         int half_displayed_screen = g_preview_list->height / 2;
@@ -155,8 +152,7 @@ ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index)
 
         if (highligted_line != NULL)
         {
-            int digits_for_total = StrUtils_getDigitsForNumber(items_count);
-            int start_of_replacement = match_position.start - pos_at_match_line + digits_for_total;
+            int start_of_replacement = match_position.start - pos_at_match_line - 1;
             char * text_to_free = highligted_line->text;
 
             char * new_line_content = StrUtils_createStrWithFragmentReplaced(
@@ -385,14 +381,10 @@ void MatchesUI_updateMatchesForFile(char * file_path)
     }
 }
 
-void MatchesUI_handleMatchesListEnter(ScrollableList * scrollable_list, int absolute_index)
+void MatchesUI_refreshItemsForPath(ScrollableList * scrollable_list, MatchItem * item)
 {
-    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_index);
-
     char * path = malloc(sizeof(char) * strlen(item->path) + 1);
     strcpy(path, item->path);
-
-    MatchesUI_replaceMatchIndexInFile(absolute_index);
 
     ScrollableListItem_destroyItems(scrollable_list->all_items);
 
@@ -413,7 +405,25 @@ void MatchesUI_handleMatchesListEnter(ScrollableList * scrollable_list, int abso
 
     ScrollableList_refreshAndPaintList(scrollable_list);
 
-    MatchesUI_handleMatchesListMove(scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index);
+    MatchesUI_handleMatchesListMove(
+        scrollable_list->first_displayed_item_index + scrollable_list->selected_line_index
+    );
+}
+
+void MatchesUI_handleKey_r_Pressed(ScrollableList * scrollable_list, int absolute_index)
+{
+    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_index);
+
+    MatchesUI_refreshItemsForPath(scrollable_list, item);
+}
+
+void MatchesUI_handleMatchesListEnter(ScrollableList * scrollable_list, int absolute_index)
+{
+    MatchItem * item = MatchItem_getItemN(g_all_matched_items, absolute_index);
+
+    MatchesUI_replaceMatchIndexInFile(absolute_index);
+
+    MatchesUI_refreshItemsForPath(scrollable_list, item);
 }
 
 void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_item)
@@ -443,44 +453,53 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
     WINDOW * matches_window = newwin(list_height, matches_list_width, total_height - list_height, 1);
     WINDOW * preview_window = newwin(list_height, preview_list_witdh, total_height - list_height, matches_list_width + 1);
 
-    ScrollableList matches_list =
-        ScrollableList_create((struct ScrollableListCreateOpts)
+    struct ScrollableListCreateOpts matches_list_opts =
     {
         .all_items = matches_scrollable_list_items,
-         .list_height = list_height,
-          .list_width = matches_list_width,
-           .selection_mode = ScrollableList_SelectionMode_FullLine,
-            .should_center_text = false,
-             .window = matches_window,
-    });
-    ScrollableList preview_list =
-        ScrollableList_create((struct ScrollableListCreateOpts)
+        .list_height = list_height,
+        .list_width = matches_list_width,
+        .selection_mode = ScrollableList_SelectionMode_FullLine,
+        .should_center_text = false,
+        .should_display_line_numbers = false,
+        .window = matches_window,
+    };
+    ScrollableList matches_list =
+        ScrollableList_create(matches_list_opts);
+
+    struct ScrollableListCreateOpts preview_list_opts =
     {
         .all_items = NULL,
-         .list_height = list_height,
-          .list_width = preview_list_witdh,
-           .selection_mode = ScrollableList_SelectionMode_LineFragment,
-            .should_center_text = false,
-             .window = preview_window,
-    });
+        .list_height = list_height,
+        .list_width = preview_list_witdh,
+        .selection_mode = ScrollableList_SelectionMode_LineFragment,
+        .should_center_text = false,
+        .should_display_line_numbers = true,
+        .window = preview_window,
+    };
+    ScrollableList preview_list =
+        ScrollableList_create(preview_list_opts);
 
     ScrollableListItem * header_list_items = MatchesUI_getHeaderItems(0, parsed_opts);
     WINDOW * header_window = newwin(header_height, total_width, 1, 1);
-    ScrollableList header_list =
-        ScrollableList_create((struct ScrollableListCreateOpts)
+
+    struct ScrollableListCreateOpts header_list_opts =
     {
         .all_items = header_list_items,
-         .list_height = header_height,
-          .list_width = total_width,
-           .selection_mode = ScrollableList_SelectionMode_NoSelection,
-            .should_center_text = true,
-             .window = header_window,
-    });
+        .list_height = header_height,
+        .list_width = total_width,
+        .selection_mode = ScrollableList_SelectionMode_NoSelection,
+        .should_center_text = true,
+        .should_display_line_numbers = false,
+        .window = header_window,
+    };
+    ScrollableList header_list =
+        ScrollableList_create(header_list_opts);
 
     g_preview_list = &preview_list;
     g_header_list = &header_list;
 
     matches_list.onEnter = &MatchesUI_handleMatchesListEnter;
+    matches_list.onKey_r_Pressed = &MatchesUI_handleKey_r_Pressed;
     matches_list.onMove = &MatchesUI_handleMatchesListMove;
 
     MatchesUI_updatePreviewList(0);

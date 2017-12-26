@@ -137,3 +137,24 @@ char * StrUtils_createStrWithFragmentReplaced(char * orig_str, int pos_start, in
 
     return final_str;
 }
+
+char * StrUtils_createStrWithTwoStrings(const char * str1, const char * str2)
+{
+    int final_str_len = strlen(str1) + strlen(str2) + 1;
+
+    char * final_str = malloc(
+            sizeof(char) * (final_str_len + 1)
+        );
+
+    snprintf(
+        final_str,
+        final_str_len,
+        "%s%s",
+        str1,
+        str2
+    );
+
+    final_str[final_str_len] = 0;
+
+    return final_str;
+}
