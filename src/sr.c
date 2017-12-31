@@ -30,7 +30,11 @@ int main(int argc, char *argv[])
 
     FileItem * normal_file_item = OptsHandlers_getFilesLists(parsed_opts);
 
-    MatchItem * matched_file = getRegexMatchesFromFiles(normal_file_item, parsed_opts->searchPattern);
+    MatchItem * matched_file = getRegexMatchesFromFiles(
+            normal_file_item,
+            parsed_opts->searchPattern,
+            parsed_opts->should_be_case_insensitive
+        );
 
     FileItem_deleteList(normal_file_item);
 

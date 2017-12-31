@@ -10,7 +10,6 @@ None.
 
 ## Features
 
-- Add case insensitive opts
 - Add option to replace matches directly, without list
 
 ## Infrastructure

@@ -25,6 +25,7 @@ static struct argp_option options[] =
     { "version", 'v', 0, 0, "Print the version", 0},
     { "delimeter", 'd', 0, 0, "Add word delimeters to the search pattern", 0},
     { "file", 'f', 0, 0, "Get the files from a list inside of PATH (has to be a file)", 0},
+    { "insensitive", 'i', 0, 0, "Use case insensitive search", 0},
     { 0 }
 };
 
@@ -42,6 +43,9 @@ static error_t parseOpt(int key, char *arg, struct argp_state *state)
         break;
     case 'f':
         opts->should_read_files_from_file = true;
+        break;
+    case 'i':
+        opts->should_be_case_insensitive = true;
         break;
     case ARGP_KEY_ARG:
         if (state->arg_num > 3)
@@ -91,6 +95,7 @@ ParsedOpts * parseOpts(int argc, char *argv[])
     opts->should_add_delimiters = false;
     opts->should_print_version_and_exit = false;
     opts->should_read_files_from_file = false;
+    opts->should_be_case_insensitive = false;
 
     argp_parse(&argp, argc, argv, 0, 0, opts);
 

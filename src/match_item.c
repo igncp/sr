@@ -170,12 +170,15 @@ void MatchItem_deleteList(MatchItem * item)
     }
 }
 
-MatchItem * getRegexMatchesFromFiles(FileItem * file_item, char * regex_str)
+MatchItem * getRegexMatchesFromFiles(FileItem * file_item, char * regex_str, bool should_be_case_insensitive)
 {
     FileItem * node = file_item;
     MatchItem * matching_file = NULL;
 
-    regex_t * compiled_regex = getCompiledRegex(regex_str);
+    regex_t * compiled_regex = getCompiledRegex(
+            regex_str,
+            should_be_case_insensitive
+        );
 
     while (true)
     {

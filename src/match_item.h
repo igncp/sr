@@ -2,6 +2,7 @@
 #define MATCH_ITEM_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "file_item.h"
 
@@ -23,6 +24,6 @@ MatchItem * MatchItem_getLast(MatchItem*);
 MatchItem * MatchItem_getNItems(MatchItem*, int n);
 MatchItem * MatchItem_copySingle(MatchItem*);
 MatchItem * MatchItem_moveFirstToEnd(MatchItem*);
-MatchItem * getRegexMatchesFromFiles(FileItem * file_item, char * regex_str);
+MatchItem * getRegexMatchesFromFiles(FileItem * file_item, char * regex_str, bool should_be_case_insensitive);
 
 #endif

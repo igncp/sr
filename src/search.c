@@ -47,11 +47,20 @@ int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex)
     return count;
 }
 
-regex_t * getCompiledRegex(char * regex_str)
+regex_t * getCompiledRegex(
+    char * regex_str,
+    bool should_be_case_insensitive
+)
 {
     regex_t * regex = malloc(sizeof(regex_t));
+    int c_tags = REG_NEWLINE;
 
-    int reti = regcomp(regex, regex_str, REG_NEWLINE);
+    if (should_be_case_insensitive)
+    {
+        c_tags = REG_NEWLINE | REG_ICASE;
+    }
+
+    int reti = regcomp(regex, regex_str, c_tags);
     if (reti)
     {
         fprintf(stderr, "Could not compile regex\n");
@@ -65,10 +74,11 @@ regex_t * getCompiledRegex(char * regex_str)
 struct Search_RegexPositions getPositionsInStrOfRegexMatchIdx(
     char * str,
     char * uncompiled_regex,
-    int index
+    int index,
+    bool should_be_case_insensitive
 )
 {
-    regex_t * compiled_regex = getCompiledRegex(uncompiled_regex);
+    regex_t * compiled_regex = getCompiledRegex(uncompiled_regex, should_be_case_insensitive);
     struct Search_RegexPositions pos;
 
     pos.start = 0;

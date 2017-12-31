@@ -16,6 +16,7 @@ static ScrollableList * g_preview_list;
 static ScrollableList * g_header_list;
 static char * g_search_pattern;
 static char * g_search_replacement;
+static bool g_should_be_case_insensitive;
 const char * too_many_lines_text = "... [sr: TOO MANY LINES] ...";
 
 ScrollableListItem * MatchesUI_getAllMatchesListItems(void)
@@ -69,7 +70,8 @@ ScrollableListItem * MatchesUI_getPreviewListItems(int absolute_selected_index)
     struct Search_RegexPositions match_position = getPositionsInStrOfRegexMatchIdx(
             file_content,
             g_search_pattern,
-            item->index
+            item->index,
+            g_should_be_case_insensitive
         );
     ScrollableListItem * scrollable_list_items = NULL;
     ScrollableListItem * last = NULL;
@@ -276,7 +278,8 @@ void MatchesUI_replaceMatchIndexInFile(int absolute_selected_index)
     struct Search_RegexPositions match_position = getPositionsInStrOfRegexMatchIdx(
             file_content,
             g_search_pattern,
-            item->index
+            item->index,
+            g_should_be_case_insensitive
         );
 
     char * new_file_content = StrUtils_createStrWithFragmentReplaced(
@@ -361,7 +364,11 @@ void MatchesUI_updateMatchesForFile(char * file_path)
         .next = NULL
     };
 
-    MatchItem * new_path_items = getRegexMatchesFromFiles(&file_item, g_search_pattern);
+    MatchItem * new_path_items = getRegexMatchesFromFiles(
+            &file_item,
+            g_search_pattern,
+            g_should_be_case_insensitive
+        );
 
     if (new_path_items == NULL)
     {
@@ -435,6 +442,8 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
 
     g_search_pattern = parsed_opts->searchPattern;
     g_search_replacement = parsed_opts->searchReplacement;
+    g_should_be_case_insensitive = parsed_opts->should_be_case_insensitive;
+
     g_all_matched_items = all_matched_item;
 
     initscr();

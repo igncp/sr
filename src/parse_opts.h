@@ -12,6 +12,7 @@ typedef struct ParsedOpts
     bool should_print_version_and_exit;
     bool should_add_delimiters;
     bool should_read_files_from_file;
+    bool should_be_case_insensitive;
 
     int exit_code;
 } ParsedOpts;
