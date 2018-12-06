@@ -9,6 +9,7 @@ default:
 		-lcheck \
 		-fprofile-arcs \
 		-ftest-coverage \
+		-I../include \
 		./*.c \
 		${SRC_FILES} \
 		-o ../build/test/test_result
