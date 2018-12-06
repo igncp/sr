@@ -2,40 +2,31 @@
 
 Search and replace for the command line.
 
-## Install
-
-As it is still in an early stage, but it has useful features available.
-
-If you want to try it, you will need to install ncurses. Currently it is only tested under Arch Linux.
-
-To run the binary:
+## Build
 
 ```
-make && ./build/bin/sr
+npm run build -s
 ```
 
-To run the tests:
+Dependencies:
+
+- [libncurses](https://en.wikipedia.org/wiki/Ncurses)
+
+
+## Develop
 
 ```
-cd tests
-make && ../build/test/test_result
+npm test -s
 ```
 
-## Background
+Dependencies:
 
-The initial project was written in JS, but the performance was not great when searching in many files.
+- [libcheck](https://libcheck.github.io/check/web/install.html)
 
-As a JS developer, the implementation was easier in JS, but C gives a better UX due to the greater speed.
+For more information you can check the following files:
 
-With the C implementation the results appear in less than 1 second even for huge volumes (e.g. ~500k lines), compared to JS where it would take more than 25 seconds.
-
-In JS everything was already handled asynchronous (files reading, searching), except the display of the results screen, where you can select which matches to change.
-
-A possible solution for JS was to load the results in the screen incrementally.
-
-However, opted by creating a C proof of concept first and the UX so far is very good.
-
-[You can find the JS project in another branch.](https://github.com/igncp/sr/tree/js)
+- [package.json](./package.json)
+- [Makefile](./Makefile)
 
 ## License
 

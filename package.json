@@ -3,6 +3,8 @@
   "description": "Search and replace for the command line.",
   "private": true,
   "scripts": {
+    "build": "make",
+    "test": "(cd test && make) && ./build/test/test_result",
     "precommit": "helpers/git-hooks/pre-commit.sh",
     "prepush": "helpers/git-hooks/pre-push.sh"
   },
