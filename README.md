@@ -4,24 +4,25 @@ Search and replace for the command line.
 
 ## Build
 
+Dependencies:
+
+- [libncurses](https://en.wikipedia.org/wiki/Ncurses): terminal gui framework
+
 ```
 npm run build -s
 ```
 
-Dependencies:
-
-- [libncurses](https://en.wikipedia.org/wiki/Ncurses)
-
 
 ## Develop
+
+Dependencies:
+
+- [astyle](http://astyle.sourceforge.net/): formatting
+- [libcheck](https://libcheck.github.io/check/web/install.html): testing framework
 
 ```
 npm test -s
 ```
-
-Dependencies:
-
-- [libcheck](https://libcheck.github.io/check/web/install.html)
 
 For more information you can check the following files:
 
