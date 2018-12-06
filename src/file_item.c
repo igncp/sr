@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utlist.h"
+
 #include "file_io.h"
 #include "str_utils.h"
 
@@ -71,7 +73,7 @@ FileItem * FileItem_getFilesListFromPath(char *name)
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
 
-            snprintf(path, sizeof(path), "%s/%s", used_name, entry->d_name);
+            snprintf(path, sizeof(path) + sizeof(entry->d_name), "%s/%s", used_name, entry->d_name);
 
             FileItem * r = FileItem_getFilesListFromPath(path);
 
@@ -141,21 +143,14 @@ void FileItem_printList(FileItem * file_item)
 
 void FileItem_deleteList(FileItem * file_item)
 {
-    FileItem * node = file_item;
+    FileItem * elt, * tmp;
 
-    while (true)
+    LL_FOREACH_SAFE(file_item,elt,tmp)
     {
-        if (node == NULL)
-        {
-            return;
-        }
+        elt->next = NULL;
 
-        FileItem * old_node = node;
-
-        node = node->next;
-
-        free(old_node->path);
-        free(old_node);
+        free(elt->path);
+        free(elt);
     }
 }
 
