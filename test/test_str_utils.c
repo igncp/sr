@@ -6,7 +6,7 @@
 
 #include "test_test_helpers.h"
 
-#include "../src/str_utils.h"
+#include "../src/str_utils_c.h"
 
 START_TEST (test_fragment_replaced)
 {

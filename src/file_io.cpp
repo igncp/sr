@@ -1,5 +1,6 @@
 #include "file_io.h"
 
+#include <string>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,34 +8,35 @@
 #include <stdbool.h>
 #include <fcntl.h>
 
-char * FileIO_getFileContent(char * file_path)
+namespace file_io
 {
-    long input_file_size;
-    FILE *input_file = fopen(file_path, "rb");
 
-    fseek(input_file, 0, SEEK_END);
-    input_file_size = ftell(input_file);
-    rewind(input_file);
+std::string * getFileContent(std::string * file_path)
+{
+    FILE* f = fopen(file_path->c_str(), "r");
 
-    char * file_contents = malloc(input_file_size * sizeof(char) + 1);
+    fseek(f, 0, SEEK_END);
+    size_t size = ftell(f);
 
-    fread(file_contents, sizeof(char), input_file_size, input_file);
-    file_contents[input_file_size] = 0;
+    char* where = new char[size];
 
-    fclose(input_file);
+    rewind(f);
+    fread(where, sizeof(char), size, f);
 
-    return file_contents;
+    delete[] where;
+
+    return new std::string(where);
 }
 
 #define MAX_NAMED_PIPE_BUFF_SIZE 1024
 
-char * FileIO_getNamedPipeContent(char * named_pipe_path)
+std::string * getNamedPipeContent(std::string * named_pipe_path)
 {
     int bytes_read;
 
-    char * total_buffer = malloc(sizeof(char) * MAX_NAMED_PIPE_BUFF_SIZE * 100000);
+    char * total_buffer = (char *)malloc(sizeof(char) * MAX_NAMED_PIPE_BUFF_SIZE * 100000);
 
-    int fd = open(named_pipe_path, O_RDONLY);
+    int fd = open(named_pipe_path->c_str(), O_RDONLY);
 
     strcpy(total_buffer, "");
 
@@ -57,17 +59,17 @@ char * FileIO_getNamedPipeContent(char * named_pipe_path)
     close(fd);
 
     int buffer_length = strlen(total_buffer);
-    char * file_contents = malloc(sizeof(char) * buffer_length + 1);
+    char * file_contents = (char *)malloc(sizeof(char) * buffer_length + 1);
     snprintf(file_contents, buffer_length, "%s", total_buffer);
 
     file_contents[buffer_length] = 0;
 
     free(total_buffer);
 
-    return file_contents;
+    return new std::string(file_contents);
 }
 
-void FileIO_setFileContent(char * file_path, char * file_content)
+void setFileContent(char * file_path, char * file_content)
 {
     FILE * fp;
 
@@ -77,3 +79,5 @@ void FileIO_setFileContent(char * file_path, char * file_content)
 
     fclose(fp);
 }
+
+} // namespace file_io

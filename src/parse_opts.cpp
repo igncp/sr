@@ -1,8 +1,7 @@
 #include "parse_opts.h"
 
+#include <string>
 #include <argp.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define ARGS_HELP_BEFORE "Search and replace for the command line."
 #define ARGS_HELP_AFTER \
@@ -19,6 +18,35 @@
     "  sr <(find . -name \"*.md\") Foo Bar -fd"
 #define ARGS_HELP_FULL ARGS_HELP_BEFORE "\v" ARGS_HELP_AFTER
 
+namespace cli_opts
+{
+
+ParsedOpts::ParsedOpts()
+{
+    this->searchPath = 0;
+    this->searchPattern = 0;
+    this->searchReplacement = 0;
+
+    this->exit_code = EXIT_SUCCESS;
+
+    this->should_add_delimiters = false;
+    this->should_print_version_and_exit = false;
+    this->should_read_files_from_file = false;
+    this->should_be_case_insensitive = false;
+}
+
+ParsedOpts::~ParsedOpts()
+{
+    delete this->searchPath;
+    this->searchPath = 0;
+
+    delete this->searchPattern;
+    this->searchPattern = 0;
+
+    delete this->searchReplacement;
+    this->searchReplacement = 0;
+}
+
 static char args_doc[] = "PATH SEARCH_PATTERN REPLACEMENT";
 static struct argp_option options[] =
 {
@@ -31,7 +59,7 @@ static struct argp_option options[] =
 
 static error_t parseOpt(int key, char *arg, struct argp_state *state)
 {
-    ParsedOpts * opts = state->input;
+    ParsedOpts * opts = (ParsedOpts *)state->input;
 
     switch (key)
     {
@@ -55,15 +83,15 @@ static error_t parseOpt(int key, char *arg, struct argp_state *state)
 
         if (state->arg_num == 0)
         {
-            opts->searchPath = strdup(arg);
+            opts->searchPath = new std::string(arg);
         }
         else if (state->arg_num == 1)
         {
-            opts->searchPattern = strdup(arg);
+            opts->searchPattern = new std::string(arg);
         }
         else
         {
-            opts->searchReplacement = strdup(arg);
+            opts->searchReplacement = new std::string(arg);
         }
 
         break;
@@ -87,15 +115,7 @@ static struct argp argp =
 
 ParsedOpts * parseOpts(int argc, char *argv[])
 {
-    ParsedOpts * opts = malloc(sizeof(ParsedOpts));
-
-    opts->exit_code = EXIT_SUCCESS;
-    opts->searchReplacement = NULL;
-
-    opts->should_add_delimiters = false;
-    opts->should_print_version_and_exit = false;
-    opts->should_read_files_from_file = false;
-    opts->should_be_case_insensitive = false;
+    ParsedOpts * opts = new ParsedOpts();
 
     argp_parse(&argp, argc, argv, 0, 0, opts);
 
@@ -107,7 +127,8 @@ ParsedOpts * parseOpts(int argc, char *argv[])
     if (opts->searchReplacement == NULL)
     {
         fprintf(stderr, "Not enough arguments\n");
-        argp_help(&argp, stderr, ARGP_HELP_USAGE, strdup("sr"));
+        char command_name[] = "sr";
+        argp_help(&argp, stderr, ARGP_HELP_USAGE, command_name);
         fprintf(stderr, "For more info, run: sr --help\n");
         opts->exit_code = EXIT_FAILURE;
 
@@ -116,17 +137,11 @@ ParsedOpts * parseOpts(int argc, char *argv[])
 
     if (opts->should_add_delimiters)
     {
-        char * origSearchPattern = opts->searchPattern;
-        int len = strlen(origSearchPattern) + 2 + 1;
-
-        opts->searchPattern = malloc(sizeof(char) * len);
-        strcpy(opts->searchPattern, "\\b");
-        opts->searchPattern[2] = 0;
-        strcat(opts->searchPattern, origSearchPattern);
-        strcat(opts->searchPattern, "\\b");
-
-        free(origSearchPattern);
+        opts->searchPattern->insert(0, "\\b");
+        opts->searchPattern->append("\\b");
     }
 
     return opts;
 }
+
+} // namespace cli_opts

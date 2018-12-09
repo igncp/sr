@@ -1,4 +1,4 @@
-#include "file_item.h"
+#include "file_item_c.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "file_io.h"
-#include "str_utils.h"
+#include "file_io_c.h"
+#include "str_utils_c.h"
 
 FileItem * FileItem_getLast(FileItem * initial_node)
 {

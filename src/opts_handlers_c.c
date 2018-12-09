@@ -1,12 +1,12 @@
-#include "opts_handlers.h"
+#include "opts_handlers_c.h"
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "parse_opts.h"
-#include "file_io.h"
+#include "parse_opts_c.h"
+#include "file_io_c.h"
 #include "version.h"
 
 void OptsHandlers_printVersion(void)

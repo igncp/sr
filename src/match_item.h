@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include "file_item.h"
+#include "file_item_c.h"
 
 typedef struct MatchItem
 {

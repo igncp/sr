@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "scrollable_list.h"
-#include "str_utils.h"
+#include "str_utils_c.h"
 
 #define KEY_ENTER_FIXED 10
 #define LEFT_SCROLL_SYMBOL "[..]"

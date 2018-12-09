@@ -12,5 +12,5 @@ make && \
     --track-origins=yes \
     --log-file=./valgrind-log \
     `# --show-leak-kinds=all \`# to see reacheable sources\`` \
-    build/bin/sr "$@" && \
+    build/bin/sr "$@" ; \
   "$EDITOR" ./valgrind-log

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "search.h"
-#include "file_io.h"
+#include "file_io_c.h"
 
 int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex)
 {

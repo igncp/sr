@@ -1,20 +1,23 @@
 #ifndef FILE_ITEM_H
 #define FILE_ITEM_H
 
+#include <string>
+
+namespace file_io
+{
+
 typedef struct FileItem
 {
-    char * path;
+    std::string * path;
     struct FileItem * next;
+
+    FileItem();
+    ~FileItem();
 } FileItem;
 
-void FileItem_printList(FileItem * file_item);
-void FileItem_deleteList(FileItem * file_item);
+FileItem * getFilesListFromPath(std::string * name);
+FileItem * getFilesListFromFile(std::string * name);
 
-int FileItem_countList(FileItem * initial_node);
-
-FileItem * FileItem_getItemN(FileItem * initial_node, int n);
-FileItem * FileItem_getLast(FileItem * initial_node);
-FileItem * FileItem_getFilesListFromPath(char *name);
-FileItem * FileItem_getFilesListFromFile(char *name);
+} // namespace file_io
 
 #endif

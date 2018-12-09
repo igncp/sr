@@ -1,19 +1,13 @@
 #ifndef PARSE_OPTS_H
 #define PARSE_OPTS_H
 
-#include <string>
-
-namespace cli_opts
-{
+#include <stdbool.h>
 
 typedef struct ParsedOpts
 {
-    ParsedOpts();
-    ~ParsedOpts();
-
-    std::string * searchPath;
-    std::string * searchPattern;
-    std::string * searchReplacement;
+    char * searchPath;
+    char * searchPattern;
+    char * searchReplacement;
 
     bool should_print_version_and_exit;
     bool should_add_delimiters;
@@ -24,7 +18,5 @@ typedef struct ParsedOpts
 } ParsedOpts;
 
 ParsedOpts * parseOpts(int argc, char *argv[]);
-
-} // namespace cli_opts
 
 #endif

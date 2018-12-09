@@ -6,9 +6,9 @@
 
 #include "match_item.h"
 #include "scrollable_list.h"
-#include "file_io.h"
-#include "file_item.h"
-#include "str_utils.h"
+#include "file_io_c.h"
+#include "file_item_c.h"
+#include "str_utils_c.h"
 #include "search.h"
 
 static MatchItem * g_all_matched_items;

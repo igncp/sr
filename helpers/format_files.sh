@@ -4,6 +4,8 @@ find \
   . \
   -type f \
   -name "*.[c|h]" \
+  -or \
+  -name "*.cpp" \
 | \
 xargs \
   -I {} \

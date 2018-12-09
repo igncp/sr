@@ -4,9 +4,9 @@
 #include <string.h>
 #include <locale.h>
 
-#include "parse_opts.h"
-#include "file_item.h"
-#include "opts_handlers.h"
+#include "parse_opts_c.h"
+#include "file_item_c.h"
+#include "opts_handlers_c.h"
 #include "match_item.h"
 #include "matches_ui.h"
 
