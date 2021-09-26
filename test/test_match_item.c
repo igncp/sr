@@ -5,7 +5,7 @@
 
 #include "test_test_helpers.h"
 
-#include "../src/match_item.h"
+#include "../src/core/match_item.h"
 
 START_TEST (test_get_n_items)
 {

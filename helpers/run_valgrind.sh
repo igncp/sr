@@ -6,11 +6,15 @@
 # Build with:
 # `configure --disable-leaks && make`
 
-make && \
-  valgrind \
-    --leak-check=full \
-    --track-origins=yes \
-    --log-file=./valgrind-log \
-    `# --show-leak-kinds=all \`# to see reacheable sources\`` \
-    build/bin/sr "$@" && \
-  "$EDITOR" ./valgrind-log
+set -e
+
+make
+
+valgrind \
+  --leak-check=full \
+  --track-origins=yes \
+  --log-file=./valgrind-log \
+  `# --show-leak-kinds=all \`# to see reacheable sources\`` \
+  build/bin/sr "$@" || true
+
+"$EDITOR" ./valgrind-log

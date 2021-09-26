@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "search.h"
+#include "../utils/search.h"
 
 MatchItem * MatchItem_getLast(MatchItem * initial_node)
 {

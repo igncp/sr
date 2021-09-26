@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "match_item.h"
-#include "scrollable_list.h"
-#include "file_io.h"
-#include "file_item.h"
-#include "str_utils.h"
-#include "search.h"
+#include "../utils/file_io.h"
+#include "../utils/str_utils.h"
+#include "../utils/file_item.h"
+#include "../utils/search.h"
+
+#include "../core/match_item.h"
+#include "../ui/scrollable_list.h"
 
 static MatchItem * g_all_matched_items;
 static ScrollableList * g_preview_list;
@@ -456,8 +457,8 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
 #define MAIN_LISTS_DIFF_WIDTH 20
     long header_height = 7;
     long matches_list_width = total_width / 2 - MAIN_LISTS_DIFF_WIDTH;
-    long preview_list_witdh = matches_list_width + MAIN_LISTS_DIFF_WIDTH * 2;
-    long list_height = total_height - header_height - 1;
+    long preview_list_witdh = matches_list_width + MAIN_LISTS_DIFF_WIDTH * 2 + 1;
+    long list_height = total_height - header_height;
 
     WINDOW * matches_window = newwin(list_height, matches_list_width, total_height - list_height, 1);
     WINDOW * preview_window = newwin(list_height, preview_list_witdh, total_height - list_height, matches_list_width + 1);
@@ -489,7 +490,7 @@ void MatchesUI_listMatches(ParsedOpts * parsed_opts, MatchItem * all_matched_ite
         ScrollableList_create(preview_list_opts);
 
     ScrollableListItem * header_list_items = MatchesUI_getHeaderItems(0, parsed_opts);
-    WINDOW * header_window = newwin(header_height, total_width, 1, 1);
+    WINDOW * header_window = newwin(header_height, total_width, 0, 1);
 
     struct ScrollableListCreateOpts header_list_opts =
     {

@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "build": "make",
-    "test": "(cd test && make) && ./build/test/test_result",
+    "install": "npm run -s build && sudo cp ./build/bin/sr /usr/bin",
     "precommit": "helpers/git-hooks/pre-commit.sh",
-    "prepush": "helpers/git-hooks/pre-push.sh"
+    "prepush": "helpers/git-hooks/pre-push.sh",
+    "test": "sh helpers/test.sh"
   },
   "devDependencies": {
     "husky": "^0.14.3"

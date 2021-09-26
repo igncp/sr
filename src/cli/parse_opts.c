@@ -106,10 +106,14 @@ ParsedOpts * parseOpts(int argc, char *argv[])
 
     if (opts->searchReplacement == NULL)
     {
+        char * name = strdup("sr");
+
         fprintf(stderr, "Not enough arguments\n");
-        argp_help(&argp, stderr, ARGP_HELP_USAGE, strdup("sr"));
+        argp_help(&argp, stderr, ARGP_HELP_USAGE, name);
         fprintf(stderr, "For more info, run: sr --help\n");
         opts->exit_code = EXIT_FAILURE;
+
+        free(name);
 
         return opts;
     }

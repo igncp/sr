@@ -2,8 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "../utils/str_utils.h"
+
 #include "scrollable_list.h"
-#include "str_utils.h"
 
 #define KEY_ENTER_FIXED 10
 #define LEFT_SCROLL_SYMBOL "[..]"
@@ -223,6 +224,7 @@ void ScrollableList_paintRowTextWithSelection(
     int line_number = line_index + 1;
     int full_text_len = strlen(text);
     int max_len = scrollable_list->width;
+
     char * printed_text = NULL;
 
     if (max_len >= full_text_len)
@@ -277,15 +279,29 @@ void ScrollableList_paintRowTextWithSelection(
 
     if (line_selection->selection_end < max_len - 1)
     {
-        char subbuff[max_len - line_selection->selection_end];
-        memcpy(
-            subbuff,
-            &printed_text[line_selection->selection_end],
-            max_len - 1 - line_selection->selection_end
-        );
-        subbuff[max_len - line_selection->selection_end] = 0;
+        int subbuff_len = max_len - line_selection->selection_end;
+        int remaining_text = strlen(printed_text) - line_selection->selection_end;
+        int cpy_len = subbuff_len > remaining_text ? remaining_text : subbuff_len;
 
-        mvwprintw(scrollable_list->window, line_number, 1 + line_selection->selection_end, "%s", subbuff);
+        if (cpy_len > 0)
+        {
+            char subbuff[cpy_len];
+
+            memcpy(
+                subbuff,
+                &printed_text[line_selection->selection_end],
+                cpy_len
+            );
+            subbuff[cpy_len] = 0;
+
+            mvwprintw(
+                scrollable_list->window,
+                line_number,
+                1 + line_selection->selection_end,
+                "%s",
+                subbuff
+            );
+        }
     }
 
     free(printed_text);
@@ -585,7 +601,7 @@ ScrollableList ScrollableList_create(struct ScrollableListCreateOpts opts)
     scrollable_list.should_display_line_numbers = opts.should_display_line_numbers;
     scrollable_list.window = opts.window;
     scrollable_list.selection_mode = opts.selection_mode;
-
+    scrollable_list.selection_line_start_pos = 0;
     scrollable_list.onKey_r_Pressed = &noopKeyFn;
     scrollable_list.onEnter = &noopKeyFn;
 

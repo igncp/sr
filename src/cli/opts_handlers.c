@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../utils/file_io.h"
+#include "../core/version.h"
+
 #include "parse_opts.h"
-#include "file_io.h"
-#include "version.h"
 
 void OptsHandlers_printVersion(void)
 {

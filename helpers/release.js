@@ -18,7 +18,7 @@ if (POSSIBLE_RELEASE_TYPES.indexOf(releaseType) === -1) {
   process.exit(1)
 }
 
-const versionFileContent = fs.readFileSync('src/version.h', 'utf-8')
+const versionFileContent = fs.readFileSync('src/core/version.h', 'utf-8')
 const currentVersionMatch = versionFileContent.match(new RegExp(REGEX_STR))
 
 if (!currentVersionMatch) {

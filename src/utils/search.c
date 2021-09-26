@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "search.h"
 #include "file_io.h"
+
+#include "search.h"
 
 int getStrRegexMatchesNumber(char * str, regex_t * compiled_regex)
 {

@@ -4,11 +4,20 @@
 #include <string.h>
 #include <locale.h>
 
-#include "parse_opts.h"
-#include "file_item.h"
-#include "opts_handlers.h"
-#include "match_item.h"
-#include "matches_ui.h"
+#include "utils/file_item.h"
+#include "cli/parse_opts.h"
+#include "cli/opts_handlers.h"
+#include "core/match_item.h"
+#include "ui/matches_ui.h"
+
+int free_opts_and_return(ParsedOpts * parsed_opts)
+{
+    int exit_code = parsed_opts->exit_code;
+
+    free(parsed_opts);
+
+    return exit_code;
+}
 
 int main(int argc, char *argv[])
 {
@@ -16,14 +25,14 @@ int main(int argc, char *argv[])
 
     if (parsed_opts->exit_code != EXIT_SUCCESS)
     {
-        return parsed_opts->exit_code;
+        return free_opts_and_return(parsed_opts);
     }
 
     if (parsed_opts->should_print_version_and_exit)
     {
         OptsHandlers_printVersion();
 
-        return parsed_opts->exit_code;
+        return free_opts_and_return(parsed_opts);
     }
 
     setlocale(LC_ALL, "en_US.UTF-8");
@@ -40,12 +49,9 @@ int main(int argc, char *argv[])
 
     MatchesUI_listMatches(parsed_opts, matched_file);
 
-    int exit_code = parsed_opts->exit_code;
-
     free(parsed_opts->searchPath);
     free(parsed_opts->searchPattern);
     free(parsed_opts->searchReplacement);
-    free(parsed_opts);
 
-    return exit_code;
+    return free_opts_and_return(parsed_opts);
 }

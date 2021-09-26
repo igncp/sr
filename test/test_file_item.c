@@ -5,7 +5,7 @@
 
 #include "test_test_helpers.h"
 
-#include "../src/file_item.h"
+#include "../src/utils/file_item.h"
 
 START_TEST (test_count)
 {

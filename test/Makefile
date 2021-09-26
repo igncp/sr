@@ -4,12 +4,11 @@ default:
 	@mkdir -p ../build/test
 	@gcc \
 		-g \
-		-lcurses \
-		-ltinfo \
-		-lcheck \
-		-fprofile-arcs \
-		-ftest-coverage \
-		-I../include \
+		-O \
 		./*.c \
 		${SRC_FILES} \
+		-I../include \
+		-ltinfo \
+		-lcheck \
+		-lcurses \
 		-o ../build/test/test_result

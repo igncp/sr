@@ -73,7 +73,13 @@ FileItem * FileItem_getFilesListFromPath(char *name)
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
 
-            snprintf(path, sizeof(path) + sizeof(entry->d_name), "%s/%s", used_name, entry->d_name);
+            snprintf(
+                path,
+                1024,
+                "%s/%s",
+                used_name,
+                entry->d_name
+            );
 
             FileItem * r = FileItem_getFilesListFromPath(path);
 

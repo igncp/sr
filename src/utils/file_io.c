@@ -18,7 +18,15 @@ char * FileIO_getFileContent(char * file_path)
 
     char * file_contents = malloc(input_file_size * sizeof(char) + 1);
 
-    fread(file_contents, sizeof(char), input_file_size, input_file);
+    int read_size = fread(file_contents, sizeof(char), input_file_size, input_file);
+
+    if (read_size != input_file_size)
+    {
+        printf("Error: Invalid read size");
+
+        exit(1);
+    }
+
     file_contents[input_file_size] = 0;
 
     fclose(input_file);

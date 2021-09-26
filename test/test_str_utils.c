@@ -6,7 +6,7 @@
 
 #include "test_test_helpers.h"
 
-#include "../src/str_utils.h"
+#include "../src/utils/str_utils.h"
 
 START_TEST (test_fragment_replaced)
 {
@@ -35,20 +35,6 @@ START_TEST (test_split_lines)
     ck_assert_str_eq(linesB->text, "0");
     ck_assert_str_eq(linesB->next->text, "");
     ck_assert_ptr_eq(linesB->next->next, NULL);
-}
-END_TEST
-
-START_TEST (test_destroy_list)
-{
-    struct StrUtils_Line * lines = malloc(sizeof(struct StrUtils_Line));
-    lines->text = strdup("foo");
-    lines->next = malloc(sizeof(struct StrUtils_Line));
-    lines->next->text = strdup("bar");
-    lines->next->next = NULL;
-
-    StrUtils_Line_destroyList(lines);
-
-    ck_assert_ptr_eq(lines->next, NULL);
 }
 END_TEST
 
@@ -81,7 +67,6 @@ Suite * test_StrUtils_suite(void)
     tcase_add_test(tc_core, test_fragment_replaced);
     tcase_add_test(tc_core, test_digits_for_number);
     tcase_add_test(tc_core, test_split_lines);
-    tcase_add_test(tc_core, test_destroy_list);
 
     suite_add_tcase(s, tc_core);
 

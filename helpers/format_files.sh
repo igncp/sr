@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
 
-find \
-  . \
-  -type f \
-  -name "*.[c|h]" \
-| \
-xargs \
-  -I {} \
-astyle \
-  --style=allman \
-  --indent-after-parens \
-  --formatted \
-  "$@" \
-  {}
+set -e
+
+sh helpers/_format_files_result.sh
+
+echo "Files formatted correctly"

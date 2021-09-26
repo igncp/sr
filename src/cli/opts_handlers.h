@@ -1,7 +1,7 @@
 #ifndef OPTS_HANDLERS_H
 #define OPTS_HANDLERS_H
 
-#include "file_item.h"
+#include "../utils/file_item.h"
 #include "parse_opts.h"
 
 void OptsHandlers_printVersion(void);
